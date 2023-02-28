@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, ReactNode } from "react";
 
 import { RootState } from "../stores/store";
 import { useSelector, useDispatch } from "react-redux";
 import { decrement, increment } from "../stores/slices/counterSlice";
-import { open, close } from "../stores/slices/drawerAnchorSlice";
+import { chanageDrawer } from "../stores/slices/drawerAnchorSlice";
 
 // import Box from "@mui/material/Box";
 // import Drawer from "@mui/material/Drawer";
@@ -15,12 +15,36 @@ import { open, close } from "../stores/slices/drawerAnchorSlice";
 // import ListItemIcon from "@mui/material/ListItemIcon";
 // import ListItemText from "@mui/material/ListItemText";
 
-import { Box, Drawer, Button, List, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Box, Drawer, Button, List, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Container } from "@mui/material";
 
 // import { InboxIcon, MailIcon } from '@mui/icons-material';
 
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+
+import MainNav from "../components/shared/MainNav";
+import MyNav from "../components/shared/MyNav";
+import SearchBox from "@/components/shared/SearchBox";
+
+const SimplePaper = () => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        "& > :not(style)": {
+          m: 1,
+          width: 128,
+          height: 128,
+        },
+      }}
+    >
+      <Paper elevation={0} />
+      <Paper />
+      <Paper elevation={3} />
+    </Box>
+  );
+};
 
 type Anchor = "top" | "left" | "bottom" | "right";
 
@@ -30,13 +54,6 @@ const TemporaryDrawer = () => {
 
   console.log("drawerState", drawerState);
 
-  const [state, setState] = useState({
-    top: false,
-    left: false,
-    bottom: false,
-    right: false,
-  });
-
   const toggleDrawer = (anchor: Anchor | string, openState: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     console.log(anchor, openState, event);
     if (event.type === "keydown" && ((event as React.KeyboardEvent).key === "Tab" || (event as React.KeyboardEvent).key === "Shift")) {
@@ -44,7 +61,7 @@ const TemporaryDrawer = () => {
     }
     console.log("change");
 
-    dispatch(open({ ...drawerState, [anchor]: openState }));
+    dispatch(chanageDrawer({ ...drawerState, [anchor]: openState }));
   };
 
   const list = (anchor: Anchor) => (
@@ -92,24 +109,23 @@ const TemporaryDrawer = () => {
   );
 };
 
-const Main = () => {
+interface MainComponentProps {
+  children?: ReactNode;
+}
+
+const Main = ({ children }: MainComponentProps) => {
   const count = useSelector((state: RootState) => state.counter.value);
   const drawerState = useSelector((state: RootState) => state.drawer);
   const dispatch = useDispatch();
 
   return (
     <>
-      <TemporaryDrawer />
-
-      <div>
-        <button aria-label="Increment value" onClick={() => dispatch(increment({ value: 1 }))}>
-          Increment
-        </button>
-        <span>{count}</span>
-        <button aria-label="Decrement value" onClick={() => dispatch(decrement(1))}>
-          Decrement
-        </button>
-      </div>
+      <MainNav />
+      <Box sx={{ bgcolor: "#cfe8fc", height: "100vh", width: "60vw", margin: "0 auto" }}>
+        <SearchBox />
+      </Box>
+      <MyNav />
+      {children}
     </>
   );
 };

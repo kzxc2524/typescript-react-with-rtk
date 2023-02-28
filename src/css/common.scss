@@ -1,0 +1,36 @@
+@charset 'utf-8';
+
+$bgColor: #0e1015;
+$navBackColor: #101318;
+$navDefaultColor: #7e828b;
+$navHovertColor: #ececec;
+
+* {
+  margin: 0;
+  padding: 0;
+}
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: #0f0f0f;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:active,
+a:hover {
+  outline: 0;
+}
+
+img {
+  border: 0;
+}
+
+#root {
+  background: $bgColor;
+  position: relative;
+  height: 200vh;
+}
