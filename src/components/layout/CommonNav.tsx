@@ -42,8 +42,8 @@ const CommonNav = ({ navList, position, children }: CommonNavProps) => {
 
   return (
     <>
-      <nav id={"mainNav"} className={!openHoldBolean ? "" : "open"} style={{ position: "fixed", [position]: 0, top: 0 }}>
-        <div id={"mainNavInner"} style={{ position: "absolute", [position]: 0, top: 0 }}>
+      <nav className={"globalNav" + (!openHoldBolean ? "" : " open")} style={{ position: "fixed", [position]: 0, top: 0 }}>
+        <div className={"globalNavInner"} style={{ position: "absolute", [position]: 0, top: 0 }}>
           {children}
           <ul>
             {navList.map((item, idx) => {

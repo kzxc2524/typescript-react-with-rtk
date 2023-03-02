@@ -1,0 +1,56 @@
+@import "common.scss";
+
+#globalSearchBox {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  //   background: red;
+
+  //   .MuiFormControl-root {
+  //     margin-top: calc(0.25 * 26rem);
+
+  //     & .muiinputbase-root {
+  //       border: "none";
+  //       overflow: "hidden";
+  //       border-radius: 8;
+  //       background-color: #272a30;
+  //       transition: "border-color", "background-color", "box-shadow";
+
+  //       &:hover {
+  //         background-color: #353940;
+  //       }
+
+  //       &.mui-focused {
+  //         background-color: #e2e4e9;
+  //         // boxShadow: `${alpha(theme.palette.primary.main; 0.25)} 0 0 0 2px`;
+  //         // borderColor: theme.palette.primary.main;
+  //         border: "none";
+  //         outline: "none";
+
+  //         & input {
+  //           &::placeholder {
+  //             color: #474a52;
+  //           }
+  //         }
+  //       }
+
+  //       & .muioutlinedinput-notchedoutline {
+  //         border: "none";
+  //       }
+
+  //       & .muiinputadornment-root {
+  //         color: #999ca3;
+  //       }
+  //       & input {
+  //         color: #999ca3;
+  //         padding: 16px 20px;
+
+  //         &::placeholder {
+  //           color: #999ca3;
+  //         }
+  //       }
+  //     }
+  //   }
+}

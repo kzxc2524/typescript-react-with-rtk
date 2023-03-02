@@ -14,7 +14,7 @@
   align-items: center;
 }
 
-#mainNav {
+.globalNav {
   width: 55px;
   height: 100vh;
   position: relative;
@@ -24,10 +24,9 @@
   justify-content: flex-start;
   align-content: center;
   background: $navBackColor;
-  //   padding: 0 10px;
-  @include box-sizing;
+  z-index: 100;
 
-  #mainNavInner {
+  .globalNavInner {
     width: 100%;
     height: 100vh;
     overflow: hidden;
@@ -89,7 +88,7 @@
 
   &.open,
   &:hover {
-    #mainNavInner {
+    .globalNavInner {
       width: 200px;
       background: $navBackColor;
     }
