@@ -4,7 +4,7 @@ import { store } from "./stores/store";
 
 import { CssBaseline } from "@mui/material";
 
-import Main from "./pages/Main";
+import AppRouter from "@/AppRouter";
 
 import "../src/css/common.scss";
 
@@ -12,7 +12,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <CssBaseline />
-      <Main></Main>
+      <AppRouter />
     </Provider>
   );
 };

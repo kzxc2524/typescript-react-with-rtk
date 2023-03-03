@@ -24,6 +24,8 @@ const Elevation = styled(Paper)(({ theme }) => ({
 
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
   position: "relative",
+  borderRadius: "0.5rem",
+  overflow: "hidden",
 
   [theme.breakpoints.down("sm")]: {
     width: "100% !important", // Overrides inline-style

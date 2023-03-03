@@ -1,0 +1,28 @@
+@import "common.scss";
+
+.example-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#myGrid {
+  flex: 1 1 0px;
+  width: 100%;
+}
+
+.ag-header-cell,
+.ag-cell {
+  color: $navDefaultColor;
+  background: $bgColor;
+}
+
+.ag-row-selected::before {
+  background: hsla(208, 100%, 72%, 0.25);
+  z-index: 10;
+}
+
+.ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within,
+.ag-cell-focus {
+  border: none;
+}

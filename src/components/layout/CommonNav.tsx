@@ -1,4 +1,5 @@
 import React, { useState, ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 import { Divider } from "@mui/material";
 
@@ -16,6 +17,7 @@ interface CommonNavProps {
 }
 
 interface mainNavList {
+  url: any;
   text: string;
   icon: ReactNode;
 }
@@ -49,11 +51,13 @@ const CommonNav = ({ navList, position, children }: CommonNavProps) => {
             {navList.map((item, idx) => {
               let text = item.text;
               let icon = item.icon;
+              let url = item.url;
+
               return (
                 <li key={item.text}>
-                  <a href="#" onClick={(e) => e.preventDefault()}>
+                  <Link to={url}>
                     <i className={"navIcon"}>{icon}</i> <span className={"navText"}>{text}</span>
-                  </a>
+                  </Link>
                 </li>
               );
             })}

@@ -7,10 +7,11 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 
 import CommonNav from "../layout/CommonNav";
 
-const MyNav = () => {
+const PersonalNav = () => {
   interface myNavList {
     text: string;
     icon: ReactNode;
+    url: string;
   }
 
   interface iconStyle {
@@ -29,14 +30,17 @@ const MyNav = () => {
     {
       text: "설정",
       icon: <SettingsIcon sx={iconStyle} />,
+      url: "/",
     },
     {
       text: "계정 생성",
       icon: <PersonAddIcon sx={iconStyle} />,
+      url: "/",
     },
     {
       text: "검색 기록",
       icon: <PendingActionsIcon sx={iconStyle} />,
+      url: "/",
     },
   ];
 
@@ -59,4 +63,4 @@ const MyNav = () => {
   );
 };
 
-export default MyNav;
+export default PersonalNav;
