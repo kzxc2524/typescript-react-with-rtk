@@ -1,11 +1,24 @@
 @import "common.scss";
 
-#globalSearchBox {
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+// #globalSearchBox {
+//   width: 100%;
+//   margin: 0 auto;
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: center;
+
+//   &.fixed {
+//     position: fixed;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     margin: auto;
+//     z-index: 100;
+//     .MuiFormControl-root {
+//       margin-top: 0;
+//     }
+//   }
+
   //   background: red;
 
   //   .MuiFormControl-root {
@@ -53,4 +66,4 @@
   //       }
   //     }
   //   }
-}
+// }

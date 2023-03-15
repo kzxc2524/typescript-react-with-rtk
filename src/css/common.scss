@@ -29,6 +29,10 @@ img {
   border: 0;
 }
 
+body {
+  background: $bgColor;
+}
+
 #root {
   background: $bgColor;
   position: relative;
@@ -40,3 +44,71 @@ html::-webkit-scrollbar {
   scrollbar-width: none; /* 파이어폭스 */
 }
 
+/* 임의의 영역 생성 */
+// .ag-body-vertical-scroll {
+//   overflow-y: scroll;
+// }
+
+// /* 아래의 모든 코드는 영역::코드로 사용 */
+// .ag-body-vertical-scroll,
+// .ag-body-vertical-scroll-viewport,
+// .ag-body-vertical-scroll-container {
+//   width: 10px;
+//   max-width: 10px;
+//   min-width: 10px;
+// }
+
+// .ag-body-viewport::-webkit-scrollbar,
+// .ag-body-vertical-scroll-viewport::-webkit-scrollbar,
+// .ag-body-vertical-scroll-container::-webkit-scrollbar {
+//   width: 10px; /* 스크롤바의 너비 */
+// }
+
+// .ag-body-vertical-scroll-viewport::-webkit-scrollbar-thumb {
+//   height: 30%; /* 스크롤바의 길이 */
+//   background: #217af4; /* 스크롤바의 색상 */
+
+//   border-radius: 10px;
+// }
+
+// .ag-body-vertical-scroll-viewport::-webkit-scrollbar-track {
+//   background: rgba(33, 122, 244, 0.1); /*스크롤바 뒷 배경 색상*/
+// }
+
+$true-white: #fff;
+$xl-white: $true-white;
+$true-black: #000;
+$xl-black: $true-black;
+
+// $xl-cool-grey-4-40: mix($xl-white, $xl-black, 89.5);
+
+@mixin scrollbar($size: 5px, $color: $xl-black) {
+  &::-webkit-scrollbar {
+    overflow-y: auto;
+    width: $size * 2;
+  }
+
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-thumb {
+    border-radius: $size;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-clip: padding-box;
+    background-color: $color;
+    border: 1px solid transparent;
+    min-height: 50px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $navHovertColor; /*스크롤바 뒷 배경 색상*/
+  }
+
+  &::-webkit-scrollbar:horizontal {
+    height: calc($size * 2);
+  }
+}
+
+// .ag-body-viewport {
+//   @include scrollbar();
+// }

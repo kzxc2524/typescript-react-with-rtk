@@ -117,7 +117,7 @@ const CardContents = ({ images, columnNum, spacing, height }: CardContentProps) 
         {images.map((image, idx) => (
           <ImageButton
             focusRipple
-            key={image.title}
+            key={image.title + idx}
             onClick={(e: React.MouseEvent) => {
               console.log(e);
             }}

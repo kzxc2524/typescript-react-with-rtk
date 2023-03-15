@@ -9,16 +9,18 @@ import { Box } from "@mui/material";
 
 import CardContents from "@/components/layout/CardContents";
 import SearchBox from "@/components/shared/SearchBox";
-import SearchTable from "@/components/shared/SearchTable";
+import SearchTable from "@/components/layout/SearchTable";
 
-const MainContainer = styled(Box)({
-  display: "flex",
-  alignItems: "flex-start",
-  flexDirection: "column",
-  justifyContent: "flex-start",
-  // background: "#cfe8fc",
-  width: "60vw",
-  margin: "0 auto",
+const MainContainer = styled(Box)(({ theme }) => {
+  return {
+    display: "flex",
+    alignItems: "flex-start",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    // background: "#cfe8fc",
+    width: `calc(100vw - 110px*1.4)`,
+    margin: "0 auto",
+  };
 });
 
 interface MainComponentProps {
@@ -99,7 +101,6 @@ const Main = () => {
   return (
     <>
       <MainContainer>
-        <SearchBox />
         <SearchTable />
       </MainContainer>
     </>

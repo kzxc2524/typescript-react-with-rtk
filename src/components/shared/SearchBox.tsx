@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ReactNode } from "react";
 
 import { FormControl, FormControlProps, InputAdornment, TextField, TextFieldProps, OutlinedInputProps, useTheme } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -18,11 +18,36 @@ interface TextInputPorops {
 
 // Styled Component를 component 밖으로 빼지 않으면 state update 직후 element의 lose focusing이 발생함
 
+const StyledFormControl = styled(FormControl)(({ theme }) => {
+  return {
+    "&": {
+      width: "100%",
+      margin: " 0 auto",
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+
+      "&.fixed": {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        right: "0",
+        margin: "auto",
+        zIndex: "100",
+        "& .MuiFormControl-root": {
+          marginTop: "0",
+        },
+      },
+    },
+  };
+});
+
 const StyledTextInput = styled(TextField)(({ theme }) => {
   return {
     "&": {
       width: "60%",
       marginTop: "calc(0.25 * 26rem);",
+
       "& .MuiInputBase-root": {
         border: "none",
         overflow: "hidden",
@@ -107,39 +132,45 @@ const TextInput = ({ placeholder = "Search...", onChange, ...props }: TextFieldP
   );
 };
 
-const SearchBox = () => {
+interface SearchBox {
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}
+
+const SearchBox = ({ style, children }: SearchBox) => {
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
-  const [ScrollY, setScrollY] = useState(0);
-  const [ScrollActive, setScrollActive] = useState(false);
+  const [position, setPosition] = useState({
+    searchInput: false,
+  });
 
-  function logit() {
-    console.log(searchBoxRef?.current);
-    // setScrollY(searchBoxRef?.current?.scrollTop);
-    // if (searchBoxRef?.current?.scrollTop > 30) {
-    //   setScrollActive(true);
-    // } else {
-    //   setScrollActive(false);
-    // }
-  }
+  const getElementPostion = () => {
+    const searchInput = document.querySelector("#globalSearchBox > .MuiFormControl-root");
+
+    const scrollY = window.scrollY; // 스크롤 양
+
+    const searchInputPosition = Math.floor(scrollY + searchInput!.getBoundingClientRect()?.top); // 절대위치, Math.floor로 정수로 변환
+
+    setPosition({
+      searchInput: scrollY >= searchInputPosition,
+    });
+  };
 
   useEffect(() => {
-    function watchScroll() {
-      searchBoxRef?.current?.addEventListener("scroll", logit);
-    }
+    window.addEventListener("scroll", getElementPostion); // 스크롤시 getBannerPosition 발생
 
-    watchScroll();
-
-    return () => {
-      searchBoxRef?.current?.removeEventListener("scroll", logit);
-    };
-  }, []);
+    return () => window.removeEventListener("scroll", getElementPostion); // 클린업, 페이지를 나가면 이벤트 삭제
+  }, [position]); // position 값이 변할 때마다 effect 실행
 
   return (
     <>
-      <FormControl id={"globalSearchBox"} ref={searchBoxRef}>
-        <TextInput />
-      </FormControl>
+      {children !== null && children !== undefined ? (
+        children
+      ) : (
+        <StyledFormControl id={"globalSearchBox"} ref={searchBoxRef}>
+          <TextInput style={style} />
+        </StyledFormControl>
+      )}
     </>
   );
 };

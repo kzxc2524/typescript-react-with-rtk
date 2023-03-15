@@ -1,20 +1,79 @@
 @import "common.scss";
 
+$tableBgColor: #181a20;
+
 .example-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 }
 
-#myGrid {
-  flex: 1 1 0px;
-  width: 100%;
+.ag-root-wrapper {
+  border: none;
+
+  .ag-header {
+    border: none;
+    .ag-header-viewport {
+      background: $bgColor;
+      .ag-header-container {
+        background: $tableBgColor;
+
+        .ag-header-cell {
+          font-size: calc(var(--ag-font-size) - 3px);
+          color: $navDefaultColor;
+          background: $bgColor;
+
+          .ag-header-cell-label {
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+  .ag-body-clipper {
+    background: $tableBgColor;
+    .ag-body-viewport {
+      .ag-row {
+        white-space: initial;
+        font-size: calc(var(--ag-font-size) - 1px);
+        border-bottom: none;
+
+        &.ag-row-odd {
+          background: $bgColor;
+        }
+        &.ag-row-even {
+          background: $tableBgColor;
+        }
+        .ag-cell {
+          color: $navDefaultColor;
+        }
+
+        &:hover {
+          cursor: pointer;
+          background: #111214;
+          .ag-cell {
+            color: $navHovertColor;
+          }
+        }
+
+        .ag-cell {
+          white-space: initial;
+        }
+      }
+    }
+  }
+
+  .ag-overlay-loading-wrapper {
+    background: $tableBgColor;
+  }
 }
 
-.ag-header-cell,
-.ag-cell {
-  color: $navDefaultColor;
-  background: $bgColor;
+.ag-keyboard-focus .ag-header-cell:focus::after {
+  border-color: #ffffff66;
+}
+
+.ag-ltr .ag-cell {
+  border-right-width: o;
 }
 
 .ag-row-selected::before {
@@ -24,5 +83,18 @@
 
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within,
 .ag-cell-focus {
-  border: none;
+  border: 1px solid #00000000;
+}
+
+.ag-body-horizontal-scroll {
+  display: none;
+}
+
+.ag-body-vertical-scroll-viewport,
+.ag-body-viewport {
+  @include scrollbar();
+
+  .ag-body-vertical-scroll-container {
+    background: $bgColor;
+  }
 }

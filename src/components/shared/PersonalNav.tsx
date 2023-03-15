@@ -56,7 +56,7 @@ const PersonalNav = () => {
           <i className={"navIcon"}>
             <AssignmentIndIcon />
           </i>
-          <span className={"navText"}>게스트 계정</span>
+          <span className={"navText"}>게스트</span>
         </a>
       </CommonNav>
     </>
