@@ -1,9 +1,40 @@
 @charset 'utf-8';
 
-$bgColor: #0e1015;
-$navBackColor: #101318;
-$navDefaultColor: #7e828b;
-$navHovertColor: #ececec;
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap");
+
+@import "_variables.module.scss";
+
+@mixin box-sizing {
+  -webkit-box-sizing: "border-box";
+  -ms-box-sizing: "border-box";
+  -moz-box-sizing: "border-box";
+  -o-box-sizing: "border-box";
+  box-sizing: "border-box";
+}
+
+@mixin flexRowMiddle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+@mixin mobile {
+  @media (min-width: #{$breakpoint-mobile}) and (max-width: #{$breakpoint-desktop - 1px}) {
+    @content;
+  }
+}
+
+// @mixin tablet {
+//   @media (min-width: #{$breakpoint-tablet}) and (max-width: #{$breakpoint-desktop - 1px}) {
+//     @content;
+//   }
+// }
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-desktop}) {
+    @content;
+  }
+}
 
 * {
   margin: 0;
@@ -29,12 +60,13 @@ img {
   border: 0;
 }
 
+html,
 body {
-  background: $bgColor;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 #root {
-  background: $bgColor;
   position: relative;
 }
 
@@ -82,7 +114,7 @@ $xl-black: $true-black;
 
 // $xl-cool-grey-4-40: mix($xl-white, $xl-black, 89.5);
 
-@mixin scrollbar($size: 5px, $color: $xl-black) {
+@mixin scrollbar($size: 5px, $color: $xl-black, $background: $navHovertColor) {
   &::-webkit-scrollbar {
     overflow-y: auto;
     width: $size * 2;
@@ -101,7 +133,7 @@ $xl-black: $true-black;
   }
 
   &::-webkit-scrollbar-track {
-    background: $navHovertColor; /*스크롤바 뒷 배경 색상*/
+    background: $background; /*스크롤바 뒷 배경 색상*/
   }
 
   &::-webkit-scrollbar:horizontal {
@@ -112,3 +144,53 @@ $xl-black: $true-black;
 // .ag-body-viewport {
 //   @include scrollbar();
 // }
+
+html[data-theme="light"],
+body[data-theme="light"] {
+  background: $emWhite;
+  #root {
+    background: $emWhite;
+    .scrollCustom {
+      @include scrollbar($color: $oceanDeepBlue);
+    }
+  }
+}
+
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  background: $bgColor;
+  #root {
+    background: $bgColor;
+    .scrollCustom {
+      @include scrollbar();
+    }
+  }
+}
+
+@include mobile {
+  // #root {
+  //   width: 100vw;
+  // }
+}
+
+@mixin notoFont($fontWeight) {
+  & {
+    font-weight: $fontWeight;
+    font-family: "Noto Sans KR", sans-serif;
+  }
+}
+.noto300 {
+  @include notoFont(300);
+}
+.noto400 {
+  @include notoFont(400);
+}
+.noto500 {
+  @include notoFont(500);
+}
+.noto600 {
+  @include notoFont(600);
+}
+.noto700 {
+  @include notoFont(700);
+}

@@ -13,6 +13,7 @@ interface mainNavList {
   text: string;
   icon: ReactNode;
   url: string;
+  class: string;
 }
 
 interface iconStyle {
@@ -32,21 +33,25 @@ const mainNavList: mainNavList[] = [
     text: "홈",
     icon: <HomeIcon sx={iconStyle} />,
     url: "/",
+    class: "",
   },
   {
     text: "가이드",
     icon: <MenuBookIcon sx={iconStyle} />,
-    url: "/",
+    url: "#",
+    class: "",
   },
   {
     text: "검색",
     icon: <QueryStatsIcon sx={iconStyle} />,
     url: "/search",
+    class: "",
   },
   {
     text: "인기",
     icon: <LocalActivityIcon sx={iconStyle} />,
-    url: "/",
+    url: "#",
+    class: "",
   },
 ];
 
@@ -58,7 +63,7 @@ const MainNav = () => {
           <i className={"navIcon"}>
             <DiamondIcon style={{ color: "red" }} />
           </i>
-          <span className={"navText"}>CSI-Vision</span>
+          <span className={"navText"}>PUM SUPPORT</span>
         </h1>
       </CommonNav>
     </>

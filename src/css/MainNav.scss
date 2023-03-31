@@ -1,17 +1,86 @@
 @import "common.scss";
 
-@mixin box-sizing {
-  -webkit-box-sizing: "border-box";
-  -ms-box-sizing: "border-box";
-  -moz-box-sizing: "border-box";
-  -o-box-sizing: "border-box";
-  box-sizing: "border-box";
+html[data-theme="light"] body[data-theme="light"] {
+  #root {
+    .globalNav {
+      background: #fff;
+
+      .globalNavInner {
+        border: solid 1px #fff;
+        box-sizing: border-box;
+        .navHead {
+          color: #fff;
+        }
+      }
+
+      a {
+        i,
+        span {
+          color: $graphite;
+        }
+      }
+
+      span.navText {
+        color: $graphite;
+      }
+
+      &.open,
+      &:hover {
+        .globalNavInner {
+          background: #fff;
+          box-sizing: border-box;
+
+          h1 span.navText {
+            color: $shallowBlack;
+          }
+          .navIcon,
+          span.navText {
+            color: $graphite;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
 }
 
-@mixin felxRowMiddle {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+html[data-theme="dark"] body[data-theme="dark"] {
+  #root {
+    .globalNav {
+      background: $navBackColor;
+      .globalNavInner {
+        .navHead {
+          color: #fff;
+        }
+      }
+
+      a {
+        i,
+        span {
+          color: $navDarkColor;
+        }
+      }
+
+      span.navText {
+        color: $navBackColor;
+      }
+
+      &.open,
+      &:hover {
+        .globalNavInner {
+          background: $navBackColor;
+
+          h1 span.navText {
+            color: $navHovertColor;
+          }
+
+          span.navText {
+            color: $navDarkColor;
+          }
+        }
+      }
+    }
+  }
 }
 
 .globalNav {
@@ -23,66 +92,64 @@
   align-items: flex-start;
   justify-content: flex-start;
   align-content: center;
-  background: $navBackColor;
-  z-index: 100;
+  z-index: 1000;
 
   .globalNavInner {
     width: 100%;
     height: 100vh;
+    padding-top: 20px;
     overflow: hidden;
     background: transparent;
     transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
 
-  .navHead {
-    display: block;
-    margin-top: 15px;
-    color: #fff;
-    @include felxRowMiddle;
-    padding: 0 15px;
-    @include box-sizing;
-  }
-
-  ul {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    margin-top: 18px;
-    padding: 0 18px;
-    @include box-sizing;
-
-    li:not(:last-child) {
-      margin-bottom: 15px;
+    .navHead {
+      display: block;
+      margin-top: 15px;
+      @include flexRowMiddle;
+      padding: 0 15px;
+      @include box-sizing;
     }
 
-    li {
+    ul {
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-top: 18px;
+      padding: 0 18px;
+      @include box-sizing;
+
+      li:not(:last-child) {
+        margin-bottom: 15px;
+      }
+
+      li.compo {
+        & .navText {
+          display: none;
+          margin: 0;
+        }
+      }
+
+      li {
+        width: 100%;
+        cursor: pointer;
+      }
     }
   }
 
   a {
     width: 100%;
-    @include felxRowMiddle;
-
-    i,
-    span {
-      color: $navDefaultColor;
-    }
+    @include flexRowMiddle;
   }
 
-  .navText {
+  span.navText {
     width: 0;
     overflow: hidden;
     display: inline-block;
     margin-left: 10px;
     white-space: nowrap;
-    color: $navBackColor;
     transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  span.navText {
     font-size: 0.65em;
   }
 
@@ -90,15 +157,16 @@
   &:hover {
     .globalNavInner {
       width: 200px;
-      background: $navBackColor;
-    }
-
-    h1 span.navText {
-      color: $navHovertColor;
-    }
-
-    span.navText {
-      color: $navDefaultColor;
+      ul {
+        li.compo {
+          & i.navIcon {
+            display: none;
+          }
+          span.navText {
+            display: inline-block;
+          }
+        }
+      }
     }
 
     .navText {
@@ -115,5 +183,37 @@
     position: absolute;
     bottom: 10px;
     left: 0;
+  }
+}
+
+@include mobile {
+  .globalNav {
+    width: 0;
+    z-index: 1500;
+    overflow: hidden;
+
+    .globalNavInner {
+      padding-top: 0;
+      background: transparent;
+    }
+
+    // .navHeader {
+    //   display: "block";
+    //   position: absolute;
+    //   left: 15px;
+    //   top: 15px;
+    //   width: 24px;
+    //   height: 24px;
+    // }
+
+    &.open {
+      width: initial;
+      height: 100vh;
+      overflow: visible;
+      background: none;
+      .globalNavInner {
+        width: 200px;
+      }
+    }
   }
 }

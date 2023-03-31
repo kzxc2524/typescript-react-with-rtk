@@ -1,106 +1,54 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../stores/store";
 
-import { styled } from "@mui/material/styles";
-
-import { Box } from "@mui/material";
-
+import MainContainer from "@/components/layout/MainContainer";
 import CardContents from "@/components/layout/CardContents";
 import SearchBox from "@/components/shared/SearchBox";
-
-const MainContainer = styled(Box)({
-  display: "flex",
-  alignItems: "flex-start",
-  flexDirection: "column",
-  justifyContent: "flex-start",
-  // background: "#cfe8fc",
-  width: "60vw",
-  margin: "0 auto",
-});
+import useLoadData from "@/hooks/useLoadData";
 
 interface MainComponentProps {
   children?: ReactNode;
 }
 
-const animals = [
-  {
-    url: "/img/Peacock.jpg",
-    title: "Peacock",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/Koala.jpg",
-    title: "Koala",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/cat-7762887_1920.jpg",
-    title: "Cat",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/cat-7762887_1920.jpg",
-    title: "Cat",
-    width: "33.3333%",
-  },
-];
-
-const animals2 = [
-  {
-    url: "/img/Peacock.jpg",
-    title: "Peacock",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/Koala.jpg",
-    title: "Koala",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/cat-7762887_1920.jpg",
-    title: "Cat",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/cat-7762887_1920.jpg",
-    title: "Cat",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/Peacock.jpg",
-    title: "Peacock",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/Koala.jpg",
-    title: "Koala",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/cat-7762887_1920.jpg",
-    title: "Cat",
-    width: "33.3333%",
-  },
-  {
-    url: "/img/cat-7762887_1920.jpg",
-    title: "Cat",
-    width: "33.3333%",
-  },
-];
+interface GoodsData {
+  category: string | string[];
+  state: string;
+  region: string;
+  image: string;
+  link: string;
+  name: string;
+  price: string;
+  soldOut: boolean;
+  taxType: string;
+}
 
 const Main = ({ children }: MainComponentProps) => {
-  const count = useSelector((state: RootState) => state.counter.value);
-  const drawerState = useSelector((state: RootState) => state.drawer);
+  useLoadData();
+  const data = useSelector((state: RootState) => state.rowData.value);
   const dispatch = useDispatch();
+
+  const [randomData, setRandomData] = useState<GoodsData[]>([]);
+
+  useEffect(() => {
+    if (data == undefined || !data.length) return;
+
+    let dataCopy = [...(data as GoodsData[])];
+
+    let newRandomData = new Array(8).fill(undefined).map(() => {
+      let randomI = Math.floor(Math.random() * (dataCopy.length + 1));
+      return dataCopy[randomI];
+    });
+    setRandomData(newRandomData);
+  }, [data]);
 
   return (
     <>
       <MainContainer>
         <SearchBox />
-        <CardContents images={animals} columnNum={4} spacing={1} height={20} />
-        <CardContents images={animals2} columnNum={3} spacing={1} height={25} />
+        <CardContents images={randomData} columnNum={4} spacing={1} />
+        {/* <CardContents images={animals2} columnNum={5} spacing={1} /> */}
       </MainContainer>
     </>
   );

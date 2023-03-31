@@ -16,7 +16,6 @@ const soldOutFilterSlice = createSlice({
   initialState: value,
   reducers: {
     changeSoldOutValue: (state, action: PayloadAction<cityData | null>) => {
-      console.log(action.payload);
       state.value = action.payload;
     },
   },

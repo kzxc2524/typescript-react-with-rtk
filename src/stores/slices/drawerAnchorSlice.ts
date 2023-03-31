@@ -22,11 +22,11 @@ const drawerAnchorSlice = createSlice({
   name: "drawerAnchor",
   initialState: value,
   reducers: {
-    chanageDrawer: (state, action: PayloadAction<anchorState>) => {
+    changeDrawer: (state, action: PayloadAction<anchorState>) => {
       state.value = action.payload;
     },
   },
 });
 
-export const { chanageDrawer } = drawerAnchorSlice.actions;
+export const { changeDrawer } = drawerAnchorSlice.actions;
 export default drawerAnchorSlice.reducer;

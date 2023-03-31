@@ -1,6 +1,156 @@
 @import "common.scss";
-
 $tableBgColor: #181a20;
+
+html[data-theme="light"] body[data-theme="light"] {
+  #root {
+    .ag-root-wrapper {
+      .ag-header {
+        .ag-header-viewport {
+          background: $blueSecond;
+          .ag-header-container {
+            background: $blueFirst;
+
+            .ag-header-cell {
+              color: $navDarkColor;
+              background: $blueSecond;
+            }
+          }
+        }
+      }
+      .ag-body-clipper {
+        background: $blueFirst;
+        .ag-body-viewport {
+          .ag-row {
+            &.ag-row-odd {
+              background: $blueSecond;
+            }
+            &.ag-row-even {
+              background: $blueFirst;
+            }
+            .ag-cell {
+              color: $graphite;
+              font-weight: bold;
+            }
+
+            &:hover {
+              cursor: pointer;
+              background: $blueThird;
+              .ag-cell {
+                color: $oceanDeepBlue;
+
+                p {
+                  font-weight: bold;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .ag-overlay-loading-wrapper {
+        background: $blueFirst;
+      }
+    }
+
+    .ag-keyboard-focus .ag-header-cell:focus::after {
+      border-color: #ffffff66;
+    }
+
+    .ag-row-selected::before {
+      background: hsla(81, 100%, 72%, 0.25);
+    }
+
+    .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within,
+    .ag-cell-focus {
+      border: 1px solid #00000000;
+    }
+
+    .ag-body-vertical-scroll-viewport,
+    .ag-body-viewport {
+      .ag-body-vertical-scroll-container {
+        background: $blueSecond;
+      }
+    }
+
+    .ag-body-vertical-scroll-viewport,
+    .ag-body-viewport {
+      @include scrollbar($color: $graphite);
+    }
+  }
+}
+
+html[data-theme="dark"] body[data-theme="dark"] {
+  #root {
+    .ag-root-wrapper {
+      .ag-header {
+        .ag-header-viewport {
+          background: $bgColor;
+          .ag-header-container {
+            background: $tableBgColor;
+
+            .ag-header-cell {
+              color: $navDarkColor;
+              background: $bgColor;
+            }
+          }
+        }
+      }
+      .ag-body-clipper {
+        background: $tableBgColor;
+        .ag-body-viewport {
+          .ag-row {
+            &.ag-row-odd {
+              background: $bgColor;
+            }
+            &.ag-row-even {
+              background: $tableBgColor;
+            }
+            .ag-cell {
+              color: $navDarkColor;
+            }
+
+            &:hover {
+              cursor: pointer;
+              background: #111214;
+              .ag-cell {
+                color: $navHovertColor;
+              }
+            }
+          }
+        }
+      }
+
+      .ag-overlay-loading-wrapper {
+        background: $tableBgColor;
+      }
+    }
+
+    .ag-keyboard-focus .ag-header-cell:focus::after {
+      border-color: #ffffff66;
+    }
+
+    .ag-row-selected::before {
+      background: hsla(208, 100%, 72%, 0.25);
+    }
+
+    .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within,
+    .ag-cell-focus {
+      border: 1px solid #00000000;
+    }
+
+    .ag-body-vertical-scroll-viewport,
+    .ag-body-viewport {
+      .ag-body-vertical-scroll-container {
+        background: $bgColor;
+      }
+    }
+
+    .ag-body-vertical-scroll-viewport,
+    .ag-body-viewport {
+      @include scrollbar();
+    }
+  }
+}
 
 .example-wrapper {
   display: flex;
@@ -14,14 +164,9 @@ $tableBgColor: #181a20;
   .ag-header {
     border: none;
     .ag-header-viewport {
-      background: $bgColor;
       .ag-header-container {
-        background: $tableBgColor;
-
         .ag-header-cell {
           font-size: calc(var(--ag-font-size) - 3px);
-          color: $navDefaultColor;
-          background: $bgColor;
 
           .ag-header-cell-label {
             justify-content: center;
@@ -31,70 +176,48 @@ $tableBgColor: #181a20;
     }
   }
   .ag-body-clipper {
-    background: $tableBgColor;
     .ag-body-viewport {
       .ag-row {
         white-space: initial;
         font-size: calc(var(--ag-font-size) - 1px);
         border-bottom: none;
 
-        &.ag-row-odd {
-          background: $bgColor;
-        }
-        &.ag-row-even {
-          background: $tableBgColor;
-        }
-        .ag-cell {
-          color: $navDefaultColor;
-        }
-
         &:hover {
           cursor: pointer;
-          background: #111214;
-          .ag-cell {
-            color: $navHovertColor;
-          }
         }
 
         .ag-cell {
           white-space: initial;
         }
       }
+
+      .ag-center-cols-viewport {
+        overflow-x: hidden;
+      }
     }
   }
-
-  .ag-overlay-loading-wrapper {
-    background: $tableBgColor;
-  }
 }
 
-.ag-keyboard-focus .ag-header-cell:focus::after {
-  border-color: #ffffff66;
-}
-
-.ag-ltr .ag-cell {
-  border-right-width: o;
-}
+// .ag-ltr .ag-cell {
+//   border-right-width: o;
+// }
 
 .ag-row-selected::before {
-  background: hsla(208, 100%, 72%, 0.25);
   z-index: 10;
-}
-
-.ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within,
-.ag-cell-focus {
-  border: 1px solid #00000000;
 }
 
 .ag-body-horizontal-scroll {
   display: none;
 }
 
-.ag-body-vertical-scroll-viewport,
-.ag-body-viewport {
-  @include scrollbar();
-
-  .ag-body-vertical-scroll-container {
-    background: $bgColor;
+@include mobile {
+  .ag-root-wrapper {
+    .ag-body-clipper {
+      .ag-body-viewport {
+        .ag-center-cols-viewport {
+          overflow-x: auto;
+        }
+      }
+    }
   }
 }

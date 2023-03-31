@@ -1,0 +1,61 @@
+$bgColor: #0e1015;
+$navBackColor: #101318;
+$navDarkColor: #7e828b;
+$navHovertColor: #ececec;
+
+$emWhite: #e2e4e9;
+$coldGrey: #7e828b;
+$darkGrey: #3a3a3a;
+$shallowBlack: #0e1015;
+$headerFontSize: 13px;
+
+$darkRed: #ab1800;
+$blueFirst: #ecf1f5;
+$blueSecond: #d9e3ec;
+$blueThird: #d1d9e7;
+$blueForth: #6c7fa1;
+$logoColor: #0072ba;
+$darkBlue: #08588a;
+
+$greyBeige: #d4c7be;
+$darkBeige: #b09f8d;
+$greenFirst: #e3e4df;
+$greenSecond: #c7c7bb;
+$greenThird: #7f877c;
+
+$oceanDarkBlue: #637c83;
+$oceanDeepBlue: #394649;
+
+$graphite: #414141;
+
+// Breakpoints
+$breakpoint-mobile: 100px;
+$breakpoint-tablet: 758px;
+$breakpoint-desktop: 1024px;
+
+:export {
+  bgColor: $bgColor;
+  navBackColor: $navBackColor;
+  navDarkColor: $navDarkColor;
+  navHovertColor: $navHovertColor;
+  emWhite: $emWhite;
+  coldGrey: $coldGrey;
+  darkGrey: $darkGrey;
+  shallowBlack: $shallowBlack;
+  headerFontSize: $headerFontSize;
+  darkRed: $darkRed;
+  blueFirst: $blueFirst;
+  blueSecond: $blueSecond;
+  blueThird: $blueThird;
+  blueForth: $blueForth;
+  logoColor: $logoColor;
+  darkBlue: $darkBlue;
+  greyBeige: $greyBeige;
+  darkBeige: $darkBeige;
+  greenFirst: $greenFirst;
+  greenSecond: $greenSecond;
+  greenThird: $greenThird;
+  oceanDarkBlue: $oceanDarkBlue;
+  oceanDeepBlue: $oceanDeepBlue;
+  graphite: $graphite;
+}

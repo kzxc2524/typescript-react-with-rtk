@@ -13,6 +13,7 @@ import {
   Chip,
   OutlinedInput,
   Paper,
+  PaperProps,
   Autocomplete,
   AutocompleteProps,
   TextField,
@@ -35,150 +36,81 @@ import { changeSoldOutValue } from "@/stores/slices/soldOutFilterSlice";
 
 const _ = require("lodash");
 
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
-
 import { alpha, styled } from "@mui/material/styles";
 
 import axios from "axios";
 
-const emWhite = "#e2e4e9";
-const coldGrey = "#7e828b";
-const darkGrey = "#3a3a3a";
-const shallowBlack = "#101318";
-const headerFontSize = "13px";
+import variables from "@/css/_variables.module.scss";
 
-const StyledFormControl = styled(FormControl)(({ theme }) => {
+import usePaletteMode from "@/hooks/usePaletteMode";
+
+interface styleProps {
+  theme_mode: string;
+}
+
+const StyledFormControl = styled(FormControl)<styleProps>(({ theme, theme_mode }) => {
   return {
     "&": {
       margin: "0 0 10px 0 ",
       "&:hover": {
         ".MuiFormLabel-root": {
-          color: emWhite,
+          color: theme_mode == "light" ? variables.graphite : variables.emWhite,
         },
       },
     },
   };
 });
 
-const StyledLabel = styled(InputLabel)(({ theme }) => {
+const StyledAutocomplete = styled(Autocomplete)<styleProps>(({ theme, theme_mode }) => {
   return {
     "&": {
-      color: coldGrey,
-      fontSize: `calc(${headerFontSize} - 1px)`,
-      "&.Mui-focused": {
-        color: emWhite,
-      },
-    },
-  };
-});
-
-const StyledFilterBox = styled(Select)(({ theme }) => {
-  return {
-    "&": {
-      fontSize: `calc(${headerFontSize} - 1px)`,
-      "& .MuiSelect-select": {
-        color: emWhite,
-      },
-
-      "&:before": {
-        borderBottom: `2px solid ${coldGrey}`,
-      },
-      "&:after": {
-        borderBottom: `2px solid ${emWhite}`,
-      },
-
-      "& .MuiSvgIcon-root": {
-        color: coldGrey,
-      },
-      "& fieldset.MuiOutlinedInput-notchedOutline": {
-        border: `1px solid ${coldGrey}`,
-      },
-
-      "&:hover": {
-        "& .MuiSvgIcon-root": {
-          color: emWhite,
-        },
-        "fieldset.MuiOutlinedInput-notchedOutline": {
-          border: `1px solid ${emWhite}`,
-        },
-      },
-      "&.Mui-focused": {
-        "& .MuiSvgIcon-root": {
-          color: emWhite,
-        },
-        "fieldset.MuiOutlinedInput-notchedOutline": {
-          border: `1px solid ${emWhite}`,
-        },
-      },
-    },
-  };
-});
-
-const StyledMenuItem = styled(MenuItem)(({ theme }) => {
-  return {
-    "&": {
-      fontSize: `calc(${headerFontSize} - 1px)`,
-      "&.MuiButtonBase-root.Mui-selected": {
-        background: coldGrey,
-        color: emWhite,
-      },
-      "&.Mui-selected, &.Mui-selected:hover": {
-        background: coldGrey,
-        color: emWhite,
-      },
-    },
-  };
-});
-
-const StyledAutocomplete = styled(Autocomplete)(({ theme }) => {
-  return {
-    "&": {
-      "&.multiSelect .MuiInputBase-root": {
+      "&.multiSelect .MuiInputBase-root.MuiInput-root": {
         display: "flex",
         flexDirection: "row",
         flexWrap: "nowrap",
         justifyContent: "flex-start",
+        paddingRight: "45px",
 
         "& .MuiTypography-root": {
-          fontSize: `calc(${headerFontSize} - 1px)`,
+          fontSize: `calc(${variables.headerFontSize} - 1px)`,
           overflow: "hidden",
           whiteSpace: "nowrap",
-          minWidth: "150px",
+          minWidth: "115px",
         },
       },
       "& .MuiFormLabel-root": {
-        fontSize: `calc(${headerFontSize} - 1px)`,
-        color: coldGrey,
+        fontSize: `calc(${variables.headerFontSize} - 1px)`,
+        color: theme_mode == "light" ? variables.graphite : variables.coldGrey,
         marginTop: "-16px",
         paddingLeft: "5px",
+        fontWeight: theme_mode == "light" ? "bold" : "normal",
 
         "&.Mui-focused": {
-          color: emWhite,
+          color: theme_mode == "light" ? variables.graphite : variables.emWhite,
           "& .MuiSvgIcon-root": {
-            color: emWhite,
+            color: theme_mode == "light" ? variables.graphite : variables.emWhite,
           },
           "fieldset.MuiOutlinedInput-notchedOutline": {
-            border: `1px solid ${emWhite}`,
+            border: `1px solid ${theme_mode == "light" ? variables.graphite : variables.emWhite}`,
           },
         },
       },
 
       "& .MuiInputBase-root": {
-        color: emWhite,
-        fontSize: `calc(${headerFontSize} - 1px)`,
+        color: theme_mode == "light" ? variables.graphite : variables.emWhite,
+        fontSize: `calc(${variables.headerFontSize} - 1px)`,
         marginTop: "0",
         width: "100%",
         paddingLeft: "5px",
 
         "&:hover:not(.Mui-disabled, .Mui-error):before": {
-          borderBottom: `2px solid ${emWhite}`,
+          borderBottom: `2px solid ${theme_mode == "light" ? variables.graphite : variables.emWhite}`, //hover
         },
         "&:before": {
-          borderBottom: `2px solid ${coldGrey}`,
+          borderBottom: `2px solid ${variables.coldGrey}`,
         },
         "&:after": {
-          borderBottom: `2px solid ${emWhite}`,
+          borderBottom: `2px solid ${theme_mode == "light" ? variables.shallowBlack : variables.emWhite}`, //focus
         },
       },
 
@@ -188,94 +120,125 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => {
           height: "0.9rem",
         },
         "& .MuiSvgIcon-root": {
-          color: emWhite,
+          color: theme_mode == "light" ? variables.graphite : variables.emWhite,
         },
       },
     },
   };
 });
 
-const StyledPaper = styled(Paper)(({ theme }) => {
+const StyledPaper = styled(Paper)<styleProps>(({ theme, theme_mode }) => {
   return {
     "&": {
       "&.MuiPaper-root": {
-        background: darkGrey,
+        background: theme_mode == "light" ? variables.emWhite : variables.darkGrey,
+        "& ul.MuiAutocomplete-listbox": {
+          "&::-webkit-scrollbar": {
+            overflowY: "auto",
+            width: "10px",
+          },
+
+          "&::-webkit-scrollbar-track, &::-webkit-scrollbar-thumb": {
+            borderRadius: "5px",
+          },
+
+          "&::-webkit-scrollbar-thumb": {
+            backgroundClip: "padding-box",
+            backgroundColor: theme_mode == "light" ? variables.graphite : "#000",
+            border: "1px solid transparent",
+            minHeight: "50px",
+          },
+
+          "&::-webkit-scrollbar-track": {
+            background: variables.emWhite /*스크롤바 뒷 배경 색상*/,
+          },
+
+          "&::-webkit-scrollbar:horizontal": {
+            height: "calc(5px * 2)",
+          },
+        },
         "& ul.MuiAutocomplete-listbox li": {
-          fontSize: `calc(${headerFontSize} - 1px)`,
-          color: coldGrey,
+          fontSize: `calc(${variables.headerFontSize} - 1px)`,
+          color: variables.coldGrey,
 
           "&.MuiAutocomplete-option.Mui-focused": {
-            background: darkGrey,
-            color: emWhite,
+            background: theme_mode == "light" ? variables.blueThird : variables.darkGrey,
+            color: theme_mode == "light" ? variables.graphite : variables.emWhite,
           },
           "&.MuiAutocomplete-option[aria-selected='true'], &.MuiAutocomplete-option[aria-selected='true'].Mui-focused": {
-            background: shallowBlack,
-            color: emWhite,
+            background: theme_mode == "light" ? variables.blueThird : variables.shallowBlack,
+            color: theme_mode == "light" ? variables.graphite : variables.emWhite,
           },
 
           "& .MuiButtonBase-root.MuiCheckbox-root.Mui-checked, & .MuiButtonBase-root-MuiCheckbox-root.MuiCheckbox-indeterminate": {
-            color: emWhite,
+            color: theme_mode == "light" ? variables.graphite : variables.emWhite,
           },
         },
 
         "&.MuiButtonBase-root.Mui-selected": {
-          background: coldGrey,
-          color: emWhite,
+          background: theme_mode == "light" ? variables.emWhite : variables.coldGrey,
+          color: theme_mode == "light" ? variables.graphite : variables.emWhite,
         },
         "&.Mui-selected, &.Mui-selected:hover": {
-          background: coldGrey,
-          color: emWhite,
+          background: theme_mode == "light" ? variables.emWhite : variables.coldGrey,
+          color: theme_mode == "light" ? variables.graphite : variables.emWhite,
         },
 
         "& .MuiAutocomplete-noOptions": {
-          color: coldGrey,
-          fontSize: `calc(${headerFontSize} - 1px)`,
+          color: variables.coldGrey,
+          fontSize: `calc(${variables.headerFontSize} - 1px)`,
           padding: "5px 10px",
         },
+      },
+    },
+    [theme.breakpoints.down(1024)]: {
+      "& ul.MuiAutocomplete-listbox": {
+        maxHeight: "200px",
       },
     },
   };
 });
 
-const StyledTextField = styled(TextField)(({ theme }) => {
+const StyledTextField = styled(TextField)<styleProps>(({ theme, theme_mode }) => {
   return {
     "&": {
       "& .MuiFormLabel-root": {
-        fontSize: `calc(${headerFontSize} - 1px)`,
-        color: coldGrey,
+        fontSize: `calc(${variables.headerFontSize} - 1px)`,
+        color: theme_mode == "light" ? variables.graphite : variables.coldGrey,
+        fontWeight: theme_mode == "light" ? "bold" : "normal",
         marginTop: "-16px",
         paddingLeft: "5px",
         "&.Mui-focused": {
-          color: emWhite,
+          color: theme_mode == "light" ? variables.graphite : variables.emWhite,
           "& .MuiSvgIcon-root": {
-            color: emWhite,
+            color: theme_mode == "light" ? variables.graphite : variables.emWhite,
           },
           "fieldset.MuiOutlinedInput-notchedOutline": {
-            border: `1px solid ${emWhite}`,
+            border: `1px solid ${variables.emWhite}`,
           },
         },
       },
 
       "& .MuiInputBase-root": {
-        color: emWhite,
-        fontSize: `calc(${headerFontSize} - 1px)`,
+        color: theme_mode == "light" ? variables.graphite : variables.emWhite,
+        fontSize: `calc(${variables.headerFontSize} - 1px)`,
         marginTop: "0",
         width: "100%",
         paddingLeft: "5px",
 
         "&:hover:not(.Mui-disabled, .Mui-error):before": {
-          borderBottom: `2px solid ${emWhite}`,
+          borderBottom: `2px solid ${theme_mode == "light" ? variables.graphite : variables.emWhite}`,
         },
         "&:before": {
-          borderBottom: `2px solid ${coldGrey}`,
+          borderBottom: `2px solid ${variables.coldGrey}`,
         },
         "&:after": {
-          borderBottom: `2px solid ${emWhite}`,
+          borderBottom: `2px solid ${theme_mode == "light" ? variables.shallowBlack : variables.emWhite}`,
         },
         "& .MuiInputAdornment-root": {
           "& .MuiTypography-root": {
-            color: coldGrey,
-            fontSize: `calc(${headerFontSize} - 4px)`,
+            color: theme_mode == "light" ? variables.shallowBlack : variables.coldGrey,
+            fontSize: `calc(${variables.headerFontSize} - 4px)`,
           },
         },
       },
@@ -294,10 +257,6 @@ interface cityList {
   district: cityData[];
 }
 
-interface style {
-  [key: string]: string;
-}
-
 interface cityValueObject {
   state: cityData | null;
   region: cityData | null;
@@ -312,14 +271,6 @@ interface minMaxValue {
   min: string | number;
   max: string | number;
 }
-interface GoodsData {
-  image: string;
-  link: string;
-  name: string;
-  price: string;
-  soldOut: boolean;
-  taxType: string;
-}
 
 interface price {
   max: string;
@@ -329,11 +280,6 @@ interface price {
 interface CustomProps {
   onChange: (event: { target: { name: string; value: string } }) => void;
   name: string;
-}
-
-interface State {
-  textmask: string;
-  numberformat: string;
 }
 
 const apiBase: string = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=*00000000&is_ignore_zero=true";
@@ -353,7 +299,7 @@ type Props<
   FreeSolo extends boolean | undefined = undefined
 > = {
   autoCompleteProps?: AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>;
-  style: style;
+  style: React.CSSProperties;
   label: string;
   options: cityData[];
   value: cityData | null;
@@ -361,10 +307,20 @@ type Props<
   onChange: (e: object, values: any, key: string) => void;
 };
 
+const CustomPaper = ({ children, ...paperProps }: { children: ReactNode } & PaperProps) => {
+  const themeMode = usePaletteMode();
+  return (
+    <StyledPaper className={"scrollCustom"} theme_mode={themeMode}>
+      {children}
+    </StyledPaper>
+  );
+};
+
 const AutoCompleteCustom = <T,>(props: Props<T>) => {
+  const themeMode = usePaletteMode();
   const { style, label, options, value, keyName, onChange } = props;
   return (
-    <StyledFormControl sx={{ ...{ m: 1 }, ...style }}>
+    <StyledFormControl sx={{ m: 1 }} style={style} theme_mode={themeMode}>
       <StyledAutocomplete
         // multiple
         id={"tags-standard" + keyName}
@@ -378,10 +334,11 @@ const AutoCompleteCustom = <T,>(props: Props<T>) => {
         }}
         // defaultValue={undefined}
         value={value}
-        PaperComponent={StyledPaper}
+        PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
         noOptionsText={"지역을 선택해주세요"}
         onChange={(e, values) => onChange(e, values, keyName)}
         renderInput={(params) => <TextField {...params} variant="standard" label={label} />}
+        theme_mode={themeMode}
       />
     </StyledFormControl>
   );
@@ -419,20 +376,11 @@ const CitiesAutoSelect = () => {
   useEffect(() => {
     const dataPromise = fetchJuso();
     dataPromise.then((data) => {
-      console.log(data.regcodes);
       let cityListCopy = { ...cityList };
       cityListCopy = { ...cityListCopy, state: data.regcodes };
       setCityList(cityListCopy);
     });
   }, []);
-
-  useEffect(() => {
-    console.log("cityValue", cityValue);
-  }, [cityValue]);
-
-  useEffect(() => {
-    console.log("cityList", cityList);
-  }, [cityList]);
 
   const allStateCode = "*00000000";
 
@@ -558,7 +506,7 @@ const CitiesAutoSelect = () => {
   return (
     <>
       <AutoCompleteCustom
-        style={{ ["minWidth"]: "150px" }}
+        style={{ width: "50%" }}
         label={"시도"}
         options={cityList.state}
         value={cityValue.state}
@@ -566,7 +514,7 @@ const CitiesAutoSelect = () => {
         onChange={codeChange}
       />
       <AutoCompleteCustom
-        style={{ ["minWidth"]: "150px" }} //["minWidth"]: "100px", ["maxWidth"]: "120px"
+        style={{ width: "50%" }} //["minWidth"]: "100px", ["maxWidth"]: "120px"
         label={"시군구"}
         options={cityList.region}
         value={cityValue.region}
@@ -585,7 +533,11 @@ const CitiesAutoSelect = () => {
   );
 };
 
-const SoldOutAutoSelect = () => {
+interface CommonStyleProps {
+  style?: React.CSSProperties;
+}
+
+const SoldOutAutoSelect = ({ style }: CommonStyleProps) => {
   const displatch = useDispatch();
 
   // const [value, setValue] = useState<cityData | null>(null);
@@ -616,7 +568,7 @@ const SoldOutAutoSelect = () => {
   return (
     <>
       <AutoCompleteCustom
-        style={{ ["minWidth"]: "110px", ["maxWidth"]: "125px" }}
+        style={style ?? {}}
         label={"재고"}
         options={list}
         value={value}
@@ -627,7 +579,8 @@ const SoldOutAutoSelect = () => {
   );
 };
 
-const MultipleAutoSelectBox = () => {
+const MultipleAutoSelectBox = ({ style }: CommonStyleProps) => {
+  const themeMode = usePaletteMode();
   const dispach = useDispatch();
 
   const theme = useTheme();
@@ -657,22 +610,21 @@ const MultipleAutoSelectBox = () => {
 
   useEffect(() => {
     let newCategotyList: string[] = [];
-    let dataCopy = data;
-    if (dataCopy !== undefined) {
-      newCategotyList = dataCopy.map(({ category }) => category) as string[];
-      newCategotyList = Array.from(new Set(newCategotyList));
-    }
+    if (data == undefined || !data.length) return;
+    let dataCopy = [...data];
+
+    newCategotyList = dataCopy.map(({ category }) => category).filter((category) => (category as string).split(",").length <= 1) as string[];
+    newCategotyList = Array.from(new Set(newCategotyList));
+
     setCategoryList({ value: [], list: newCategotyList });
   }, [data]);
 
   const handleChange = (e: SelectChangeEvent<typeof personName>, values: any) => {
-    console.log(values);
-
     setCategoryValue({ value: values, list: [...categoryList] });
   };
 
   return (
-    <StyledFormControl sx={{ m: 1, width: 200 }}>
+    <StyledFormControl style={style ?? {}} theme_mode={themeMode}>
       <StyledAutocomplete
         className={"multiSelect"}
         multiple
@@ -682,8 +634,8 @@ const MultipleAutoSelectBox = () => {
         // }}
         // defaultValue={undefined}
         value={categoryValue}
-        PaperComponent={StyledPaper}
-        noOptionsText={"지역을 선택해주세요"}
+        PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
+        noOptionsText={""}
         disableCloseOnSelect
         onChange={(e, values) => handleChange(e as SelectChangeEvent<typeof personName>, values)}
         renderInput={(params) => <TextField {...params} variant="standard" label={"분류"} />}
@@ -700,23 +652,24 @@ const MultipleAutoSelectBox = () => {
           const numTags = value.length;
 
           return (
-            <Typography variant="body2" style={{ minWidth: "initial" }}>
+            <Typography variant="body2">
               {/* {numTags + "  "} */}
               {value
                 .slice(0, 2)
                 .map((option, _) => {
                   let str = option as string;
                   if (numTags > 2) {
-                    return str.length > 4 ? str.slice(0, 3) + "··" : str;
+                    return str.length > 2 ? str.slice(0, 2) + "··" : str;
                   } else {
                     return str;
                   }
                 })
                 .join(", ")}
-              {numTags > 2 && ` +${numTags - 2} more`}
+              {numTags > 2 && ` +${numTags - 2}`}
             </Typography>
           );
         }}
+        theme_mode={themeMode}
       />
     </StyledFormControl>
   );
@@ -746,6 +699,7 @@ const NumericFormatCustom = React.forwardRef<NumericFormatProps, CustomProps>(fu
 });
 
 const PriceInputTextField = () => {
+  const themeMode = usePaletteMode();
   const dispatch = useDispatch();
   // const [priceValue, setPriceValue] = useState<price>({ max: "", min: "" });
 
@@ -777,8 +731,9 @@ const PriceInputTextField = () => {
           endAdornment: <InputAdornment position="end">P ~</InputAdornment>,
         }}
         variant="standard"
+        style={{ width: "50%", margin: "0 0 10px 0" }}
+        theme_mode={themeMode}
       />
-      <Typography sx={{ color: coldGrey }}></Typography>
       <StyledTextField
         label="최대 가격"
         value={priceValue.max}
@@ -790,6 +745,8 @@ const PriceInputTextField = () => {
           endAdornment: <InputAdornment position="start">P</InputAdornment>,
         }}
         variant="standard"
+        style={{ width: "50%", margin: "0 0 10px 0" }}
+        theme_mode={themeMode}
       />
     </>
   );

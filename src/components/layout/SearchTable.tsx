@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 
+import { useLocation, useNavigate } from "react-router-dom";
 import { render } from "react-dom";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
@@ -9,20 +10,25 @@ import "@/css/SearchTable.scss";
 
 import { parse, ParseResult } from "papaparse";
 
-import { useSelector, useDispatch } from "react-redux";
-
-import SearchBox from "@/components/shared/SearchBox";
+import { StyledTextField } from "@/components/shared/SearchBox";
 import SearchTableFilters from "@/components/layout/SearchTableFilters";
 import useWindowSize from "@/hooks/useWIndowSize";
 import useFilterData from "@/hooks/useFilterData";
 
+import { useSelector, useDispatch } from "react-redux";
+
 import { RootState } from "@/stores/store";
+
 import { init } from "@/stores/slices/dataSlice";
 import { changeSearchInputValue } from "@/stores/slices/searchInputValueSlice";
+import { changeFilterToggle } from "@/stores/slices/filterToggleSlice";
 
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-import { Box, Typography, CircularProgress, CircularProgressProps } from "@mui/material";
+import { Box, Typography, Divider, IconButton } from "@mui/material";
+
+import ClearIcon from "@mui/icons-material/Clear";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 import {
   CheckboxSelectionCallbackParams,
@@ -39,15 +45,41 @@ import {
   RowClickedEvent,
   ColumnResizedEvent,
   StatusPanelDef,
+  FirstDataRenderedEvent,
 } from "ag-grid-community";
 
-const SearchContainer = styled(Box)({
-  width: "100%",
-  height: "100vh",
-  // marginTop: "50px",
-  background: "#181a20",
-  borderRadius: "15px",
-  padding: "calc(0.25*6rem) 2rem 0",
+import variables from "@/css/_variables.module.scss";
+
+import usePaletteMode from "@/hooks/usePaletteMode";
+
+interface styleProps {
+  theme_mode: string;
+}
+
+const SearchContainer = styled(Box)<styleProps>(({ theme, theme_mode }) => {
+  return {
+    width: "100%",
+    height: "calc(100vh - 20px)",
+    // marginTop: "50px",
+    background: theme_mode == "light" ? variables.emWhite : "#181a20",
+    borderRadius: "15px",
+    marginTop: "20px",
+    padding: "calc(0.25*6rem) 2rem 0",
+    "& .ag-theme-alpine": {
+      height: "100%",
+      width: "100%",
+      position: "relative",
+      color: "#fff",
+    },
+    [theme.breakpoints.down(1024)]: {
+      padding: "calc(0.25*8rem) 0.1rem 0",
+      height: "initial",
+      marginTop: "0",
+      "& .ag-theme-alpine": {
+        height: "100vh",
+      },
+    },
+  };
 });
 
 const StyledColumnTextWrap = styled(Box)({
@@ -61,18 +93,121 @@ const StyledColumnText = styled(Typography)({
   fontSize: "inherit",
 });
 
-interface IOlympicData {
-  athlete: string;
-  age: number;
-  country: string;
-  year: number;
-  date: string;
-  sport: string;
-  gold: number;
-  silver: number;
-  bronze: number;
-  total: number;
-}
+const headerFontSize = "13px";
+
+const StyledDiv = styled("div")(({ theme }) => {
+  return {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    [theme.breakpoints.down(1024)]: {
+      justifyContent: "flex-start",
+      alignItems: "center",
+      flexDirection: "column",
+    },
+  };
+});
+const StyledBox = styled(Box)(({ theme }) => {
+  return {
+    width: "20%",
+    marginBottom: "8px",
+    [theme.breakpoints.down(1024)]: {
+      "&": {
+        width: "100%",
+        marginTop: "40px",
+        marginBottom: "10px",
+        display: "flex",
+        justifyContent: "space-between",
+        flexDirection: "row",
+      },
+    },
+  };
+});
+
+const StyledTableTextField = styled(StyledTextField)<styleProps>(({ theme, theme_mode }) => {
+  return {
+    "&": {
+      width: "100%",
+      marginTop: 0,
+
+      "& .MuiInputBase-root": {
+        borderRadius: 4,
+        boxShadow: theme_mode == "light" ? "none" : "0 0 10px 3px #ababab10",
+        paddingRight: 0,
+        "& .MuiSvgIcon-root": {
+          fontSize: "1.3rem",
+        },
+
+        "& .MuiInputBase-input": {
+          fontSize: `calc(${headerFontSize} - 1px)`,
+          padding: "4px 0 4px 15px",
+        },
+
+        "& .MuiButtonBase-root": {
+          color: theme_mode == "light" ? variables.darkGrey : variables.coldGrey,
+          padding: "0 10px",
+        },
+      },
+    },
+    [theme.breakpoints.down(1024)]: {
+      "&": {
+        width: "calc(100% - 50px)",
+        justifyContent: "center",
+
+        "& .MuiInputBase-root": {
+          borderRadius: 4,
+          boxShadow: theme_mode == "light" ? "none" : "0 0 10px 3px #ababab10",
+          paddingRight: 0,
+          "& .MuiSvgIcon-root": {
+            fontSize: "1.3rem",
+          },
+
+          "& .MuiInputBase-input": {
+            fontSize: `calc(${headerFontSize} + 1px)`,
+            padding: "4px 0 4px 15px",
+          },
+
+          "& .MuiButtonBase-root": {
+            color: theme_mode == "light" ? variables.darkGrey : variables.coldGrey,
+            padding: "0 10px",
+          },
+        },
+      },
+    },
+  };
+});
+
+const StyledIconButton = styled(IconButton)<styleProps>(({ theme, theme_mode }) => {
+  return {
+    "&": {
+      display: "none",
+    },
+    [theme.breakpoints.down(1024)]: {
+      "&": {
+        display: "flex",
+        height: "28px",
+        padding: " 3px 10px",
+        /* border: solid 1px #fff; */
+        borderRadius: "5px",
+        background: theme_mode == "light" ? variables.graphite : variables.bgColor,
+        boxSizing: "border-box",
+        alignItems: "center",
+        flexDirection: "column",
+
+        "&:hover": {
+          background: "#353940",
+          "& .MuiSvgIcon-root": {
+            color: theme_mode == "light" ? variables.navHovertColor : variables.emWhite,
+          },
+        },
+
+        "& .MuiSvgIcon-root": {
+          color: "#7e828b",
+        },
+      },
+    },
+  };
+});
 
 interface GoodsData {
   category: string | string[];
@@ -88,6 +223,13 @@ interface GoodsData {
 
 interface Values {
   data: GoodsData[];
+}
+
+interface anchorState {
+  top: boolean;
+  right: boolean;
+  bottom: boolean;
+  left: boolean;
 }
 
 function isFirstColumn(params: CheckboxSelectionCallbackParams | HeaderCheckboxSelectionCallbackParams) {
@@ -179,91 +321,20 @@ function dateFormatter(params: { data: { date: string } }) {
   return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
 }
 
-const theme = createTheme({
-  palette: {
-    neutral: {
-      main: "#64748B",
-      contrastText: "#fff",
-    },
-  },
-});
-
-declare module "@mui/material/styles" {
-  interface Palette {
-    neutral: Palette["primary"];
-  }
-
-  // allow configuration using `createTheme`
-  interface PaletteOptions {
-    neutral?: PaletteOptions["primary"];
-  }
+interface location {
+  searchInputValue?: string;
 }
-
-// Update the Button's color prop options
-declare module "@mui/material/CircularProgress" {
-  interface CircularProgressPropsColorOverrides {
-    neutral: true;
-  }
-}
-
-const CircularProgressWithLabel = (props: CircularProgressProps & { value: number }) => {
-  return (
-    <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          position: "absolute",
-          display: "flex",
-          width: "100%",
-          height: "100%",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignContent: "center",
-          zIndex: "100",
-          alignItems: "center",
-          left: "0",
-          right: "0",
-          top: "0",
-          bottom: "0",
-          margin: "auto",
-        }}
-      >
-        <CircularProgress />
-        {/* <Box
-          sx={{
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-            position: "absolute",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography variant="caption" component="div" color="#fff">{`${Math.round(props.value)}%`}</Typography>
-        </Box> */}
-      </Box>
-    </ThemeProvider>
-  );
-};
-
-const CircularStatic = () => {
-  const [progress, setProgress] = React.useState(10);
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
-    }, 800);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  return <CircularProgressWithLabel value={progress} />;
-};
 
 const SearchTable = () => {
+  const themeMode = usePaletteMode();
+
   const dispatch = useDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const navigateState = location.state as location;
+
+  const mainSearchInputValue = navigateState?.searchInputValue ?? "";
   const data = useSelector((state: RootState) => {
     return state.rowData.filtered;
   });
@@ -280,14 +351,26 @@ const SearchTable = () => {
     dispatch(changeSearchInputValue(data));
   };
 
+  const filterToggle = useSelector((state: RootState) => {
+    return state.filterToggle.value;
+  });
+
+  const setFilterToggle = (data: boolean) => {
+    dispatch(changeFilterToggle(data));
+  };
+
   useFilterData();
   const { width, height } = useWindowSize();
   const [imageSize, setImageSize] = useState({
-    width: 150,
-    height: 150,
+    width: 170,
+    height: 170,
   });
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<AgGridReact<GoodsData>>(null);
+
+  const [showClearIcon, setShowClearIcon] = useState<string>("none");
+  // const [tableLoading, setTableLoading] = useState<boolean>(false);
 
   const [gridApi, setGridApi] = useState<GridApi>();
   const [rowData, setRowData] = useState<GoodsData[] | undefined>();
@@ -296,7 +379,8 @@ const SearchTable = () => {
     {
       headerName: "",
       field: "image",
-      maxWidth: imageSize.width + 20,
+      minWidth: imageSize.width,
+      maxWidth: imageSize.width,
       sortable: false,
       cellRenderer: (params: ICellRendererParams<GoodsData, undefined>) => {
         // console.log(params);
@@ -312,15 +396,17 @@ const SearchTable = () => {
                 alignItems: "center",
               }}
             >
-              <img style={{ width: "auto", height: "95%" }} src={params?.data?.image} />
+              <img style={{ width: "auto", height: "95%" }} src={params?.data?.image} alt={"상품 이미지"} />
             </div>
           </>
         );
       },
+      getQuickFilterText: () => "",
     },
     {
       headerName: "",
       field: "name",
+      minWidth: 250,
       sortable: false,
       cellStyle: { textAlign: "left" },
       cellRenderer: (params: ICellRendererParams<GoodsData, undefined>) => {
@@ -333,6 +419,9 @@ const SearchTable = () => {
             <StyledColumnText>{params?.data?.name.replace(/\[[^\]]*\]\s*/g, "")}</StyledColumnText>
           </StyledColumnTextWrap>
         );
+      },
+      getQuickFilterText: (params) => {
+        return params.data.state + " " + params.data.region + " " + params.data.category + " " + params.data.name;
       },
     },
     {
@@ -347,6 +436,11 @@ const SearchTable = () => {
             <StyledColumnText>{params?.data?.price}</StyledColumnText>
           </StyledColumnTextWrap>
         );
+      },
+      getQuickFilterText: (params) => {
+        let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/a-zA-Z ]/gim;
+
+        return params.value.replace(reg, "");
       },
     }, // filter: "agNumberColumnFilter"valueFormatter: priceFormatter,
     {
@@ -364,6 +458,7 @@ const SearchTable = () => {
           </StyledColumnTextWrap>
         );
       },
+      getQuickFilterText: (params) => (params.value ? "품절" : "구매 가능"),
     }, //valueFormatter: dateFormatter, comparator: dateComparator ,
   ]);
 
@@ -397,15 +492,10 @@ const SearchTable = () => {
     };
   }, []);
 
-  // const onGridReady = useCallback((params: GridReadyEvent) => {
-  //   fetch("https://www.ag-grid.com/example-assets/olympic-winners.json")
-  //     .then((resp) => resp.json())
-  //     .then((data: IOlympicData[]) => setRowData(data));
-  // }, []);
-
-  const filePath: string = "../../data/data_20230314_094505.csv";
-
   const onGridReady = useCallback((params: GridReadyEvent) => {
+    if (data !== undefined && data.length) return;
+    // setTableLoading(true);
+
     // save AgGrid api
     setGridApi(params.api);
 
@@ -417,48 +507,37 @@ const SearchTable = () => {
     // debugger;
 
     // csv localfile load an parse
-    parse(filePath, {
-      download: true,
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true,
-      complete: function (results: ParseResult<GoodsData>) {
-        /* ...code stuff... */
 
-        let oldData = results.data;
-        if (!oldData.length) {
-          // params.api!.showNoRowsOverlay();
-          return;
-        }
+    // const parsePromise = parseToCSV(filePath);
 
-        let newData = oldData.reduce((acc, curr, idx) => {
-          let duplIdx = acc.findIndex(({ name, price, soldOut }) => {
-            return [name.replace(/\[[^\]]*\]\s*/g, ""), price, soldOut].every((elem) => {
-              return [curr.name.replace(/\[[^\]]*\]\s*/g, ""), curr.price, curr.soldOut].includes(elem);
-            });
-          });
-
-          if (duplIdx === -1) {
-            acc = [...acc, curr];
-          } else {
-            let regionStr = acc[duplIdx].region + "," + curr.region;
-            let cateStr = acc[duplIdx].category + "," + curr.category;
-
-            acc[duplIdx] = {
-              ...acc[duplIdx],
-              region: Array.from(new Set(regionStr.split(","))).join(","),
-              category: Array.from(new Set(cateStr.split(","))).join(","),
-            };
-          }
-
-          return acc;
-        }, [] as GoodsData[]);
-
-        setData(newData);
-        params.api!.hideOverlay();
-      },
-    });
+    // parsePromise
+    //   .then((result) => {
+    //     let oldData = result as GoodsData[];
+    //     setData(oldData);
+    //   })
+    //   .then(() => {
+    //     params.api!.hideOverlay();
+    //     // setTableLoading(false);
+    //   });
   }, []);
+
+  const onFirstDataRendered = (e: FirstDataRenderedEvent<GoodsData>) => {
+    // 페이지 재렌더링 마다 작동, 데이블 데이터 로드 후 한 번만 작동함
+    let inputValue = mainSearchInputValue.length ? mainSearchInputValue : searchInputValue;
+
+    if (inputValue !== "") {
+      setShowClearIcon("flex");
+    } else {
+      setShowClearIcon("none");
+    }
+
+    if (inputValue == "") return;
+
+    e.api.setQuickFilter(inputValue);
+    setSearchInputValue(inputValue);
+    searchInputRef.current?.focus();
+    navigate("/search", { replace: true }); //location 지우기
+  };
 
   const isGoodsData = (arg: GoodsData[] | undefined): arg is GoodsData[] => {
     return true;
@@ -467,11 +546,19 @@ const SearchTable = () => {
   const onQuickFilterChanged = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     gridRef.current!.api.setQuickFilter(e.target.value);
     setSearchInputValue(e.target.value);
+    if (e.target.value !== "") {
+      setShowClearIcon("flex");
+    } else {
+      setShowClearIcon("none");
+    }
   }, []);
 
-  const setRowHeight = useCallback((params: RowHeightParams): number | undefined | null => {
-    return imageSize.height;
-  }, []);
+  const setRowHeight = useCallback(
+    (params: RowHeightParams): number | undefined | null => {
+      return imageSize.height;
+    },
+    [imageSize]
+  );
 
   const onGridRowClick = (e: RowClickedEvent) => {
     // console.log("row clicked", e);
@@ -484,58 +571,108 @@ const SearchTable = () => {
 
   // Responsive Columns
   const onGridSizeChanged = (params: GridSizeChangedEvent) => {
-    console.log(params);
+    // console.log(params.columnApi);
     let imageColumnWidth = params.columnApi.getColumn("image")?.["actualWidth"];
     // console.log(imageColumnWidth);
 
-    // let tableWidth = params.clientWidth;
+    let tableWidth = params.clientWidth;
     // let tableHeight = params.clientHeight;
+
+    const columnDefsCopy = [...columnDefs];
+    const imageSizeCopy = { ...imageSize };
+
+    let newSize = 170;
+
+    if (tableWidth <= 540) {
+      newSize = 120;
+      imageSizeCopy.width = newSize;
+      imageSizeCopy.height = newSize;
+
+      columnDefsCopy.forEach((colDef, index) => {
+        if (colDef.field == "image") {
+          colDef.minWidth = newSize;
+          colDef.maxWidth = newSize;
+        }
+      });
+    } else {
+      newSize = 170;
+      imageSizeCopy.width = newSize;
+      imageSizeCopy.height = newSize;
+
+      columnDefsCopy.forEach((colDef, index) => {
+        if (colDef.field == "image") {
+          colDef.minWidth = newSize;
+          colDef.maxWidth = newSize;
+        }
+      });
+    }
+
+    params.api.setColumnDefs(columnDefsCopy);
+    setImageSize(imageSizeCopy);
+
+    params.api.forEachNode(function (rowNode) {
+      if (rowNode.data) {
+        rowNode.setRowHeight(newSize);
+      }
+    });
+    params.api.onRowHeightChanged();
+
     params.api.sizeColumnsToFit();
-    // console.log(imageColumnWidth);
   };
-  // const onSelectionChanged = useCallback(() => {
-  //   var selectedRows = gridRef.current!.api.getSelectedRows();
-  //   var selectedRowsString = "";
-  //   var maxToShow = 5;
-  //   selectedRows.forEach(function (selectedRow, index) {
-  //     if (index >= maxToShow) {
-  //       return;
-  //     }
-  //     if (index > 0) {
-  //       selectedRowsString += ", ";
-  //     }
-  //     selectedRowsString += selectedRow.athlete;
-  //   });
-  //   if (selectedRows.length > maxToShow) {
-  //     var othersCount = selectedRows.length - maxToShow;
-  //     selectedRowsString += " and " + othersCount + " other" + (othersCount !== 1 ? "s" : "");
-  //   }
 
-  // console.log(document.querySelector("#selectedRows"));
+  const handleClearClick = (e: React.MouseEvent<HTMLElement>): void => {
+    setSearchInputValue("");
+    gridRef.current!.api.setQuickFilter("");
+    setShowClearIcon("none");
+  };
 
-  // (document.querySelector("#selectedRows") as any)?.innerHTML = selectedRowsString;
-  // }, []);
+  const filterToggleClick = (e: React.MouseEvent<HTMLElement>): void => {
+    setFilterToggle(!filterToggle);
+  };
 
-  // useEffect(() => {
-  //   const agBodyViewport: HTMLElement | null = document.querySelector(".ag-body-viewport");
-  //   console.log("agBodyViewport", agBodyViewport);
-  //   if (agBodyViewport) {
-  //     const ps = new PerfectScrollbar(agBodyViewport);
-  //     ps.update();
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (width == undefined) return;
+    if (width >= 1024) {
+      setFilterToggle(true);
+    }
+  }, [width]);
 
   return (
     <>
-      <SearchContainer style={{ position: "relative" }}>
-        {/* <CircularProgressWithLabel value={progress} /> */}
+      <SearchContainer style={{ position: "relative" }} theme_mode={themeMode}>
         <div className="example-wrapper" style={{ position: "relative" }}>
-          <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-            <input type="text" onInput={onQuickFilterChanged} id="quickFilter" placeholder="상품 검색" style={{ width: "20%" }} />
-            <SearchTableFilters width={"75%"} />
-          </div>
+          <StyledDiv>
+            <StyledBox>
+              <StyledTableTextField
+                theme_mode={themeMode}
+                type="text"
+                onInput={onQuickFilterChanged}
+                placeholder="키워드를 입력하세요"
+                value={searchInputValue}
+                inputRef={searchInputRef}
+                InputProps={{
+                  endAdornment: (
+                    <>
+                      {/* <IconButton type="button" aria-label="search" onClick={handleClick}>
+                      <SearchIcon className={"searchBoxClear"} />
+                    </IconButton> */}
+                      <Divider sx={{ display: showClearIcon, height: "85%" }} orientation="vertical" />
+                      <IconButton type="button" sx={{ display: showClearIcon }} aria-label="search" onClick={handleClearClick}>
+                        <ClearIcon className={"searchBoxClear"} />
+                      </IconButton>
+                    </>
+                  ),
+                }}
+              />
 
-          <div style={{ height: "100%", width: "100%", position: "relative", color: "#fff" }} className="ag-theme-alpine">
+              <StyledIconButton type="button" onClick={filterToggleClick} theme_mode={themeMode}>
+                <FilterListIcon />
+              </StyledIconButton>
+            </StyledBox>
+            <SearchTableFilters />
+          </StyledDiv>
+
+          <div className="ag-theme-alpine">
             <AgGridReact<GoodsData>
               // statusBar={statusBar}
               headerHeight={25}
@@ -552,8 +689,9 @@ const SearchTable = () => {
               onRowClicked={onGridRowClick}
               // onColumnResized={onColumnResize}
               onGridSizeChanged={onGridSizeChanged}
-              overlayLoadingTemplate={'<span class="ag-grid-laoding-overay">답례품 목록을 불러오는 중입니다</span>'}
+              overlayLoadingTemplate={'<span class="ag-grid-laoding-overay"></span>'}
               overlayNoRowsTemplate={`검색 결과가 없습니다.`}
+              onFirstDataRendered={onFirstDataRendered}
               // onSelectionChanged={onSelectionChanged}
             ></AgGridReact>
           </div>

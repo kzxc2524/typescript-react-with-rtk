@@ -80,6 +80,8 @@ const useFilterData = () => {
 
     setNewData(newData);
     setFilteredData(newData as GoodsData[]);
+
+    return () => {};
   }, [categoryValue, stateValue, regionValue, minPriceValue, maxPriceValue, soldOutValue]);
 
   return newData;
