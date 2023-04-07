@@ -16,6 +16,7 @@ import filterToggleSlice from "./slices/filterToggleSlice";
 import dataLoadingSlice from "./slices/dataLoadingSlice";
 import paletteModeSlice from "./slices/paletteModeSlice";
 import themeModeSlice from "./slices/themeModeSlice";
+import renderNumSlice from "./slices/renderNumSlice";
 
 const rootReducer = combineReducers({
   counter: counterSliceReducer,
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   dataLoading: dataLoadingSlice,
   paletteMode: paletteModeSlice,
   themeMode: themeModeSlice,
+  renderNum: renderNumSlice,
 });
 
 const persistConfig = {

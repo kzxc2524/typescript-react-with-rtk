@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useLocation, useNavigate, createSearchParams } from "react-router-dom";
+
 import { RootState } from "@/stores/store";
+import { useDispatch, useSelector } from "react-redux";
 
-import { init, filter } from "@/stores/slices/dataSlice";
+import { filter } from "@/stores/slices/dataSlice";
 
 interface GoodsData {
   category: string | string[];
@@ -22,10 +24,20 @@ interface initialState {
   filtered: GoodsData[] | undefined;
 }
 
+interface location {
+  searchInputValue?: string;
+}
+
 const _ = require("lodash");
 
 const useFilterData = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const navigateState = location.state as location;
+
+  const mainSearchInputValue = navigateState?.searchInputValue ?? "";
 
   const [newData, setNewData] = useState<GoodsData[]>([]);
 
@@ -52,13 +64,36 @@ const useFilterData = () => {
     return state.soldOutFilter.value;
   });
 
+  const renderNum = useSelector((state: RootState) => {
+    return state.renderNum.value;
+  });
+
   const setFilteredData = (data: GoodsData[]) => {
     dispatch(filter(data));
   };
 
   useEffect(() => {
     if (data == undefined) return;
-    // console.log("sBoolean", maxPriceValue, minPriceValue, categoryValue);
+
+    if (renderNum) {
+      navigate(
+        {
+          pathname: "/search",
+          search: createSearchParams({
+            category: categoryValue.length > 1 ? categoryValue.join(",") : categoryValue,
+            state: stateValue?.name === undefined ? [] : stateValue?.name,
+            region: regionValue?.name === undefined ? [] : regionValue?.name,
+            stateCode: stateValue?.code === undefined ? [] : stateValue?.code,
+            regionCode: regionValue?.code === undefined ? [] : regionValue?.code,
+            minPrice: minPriceValue.length ? String(minPriceValue) : [],
+            maxPrice: maxPriceValue ? String(maxPriceValue) : [],
+            soldOut: soldOutValue?.code !== undefined ? String(soldOutValue.code) : [],
+          }).toString(),
+        },
+        { state: { searchInputValue: mainSearchInputValue } }
+      );
+    }
+
     let newData = data.filter((item) => {
       let { category, state, region, price, soldOut } = { ...item };
 
@@ -82,7 +117,7 @@ const useFilterData = () => {
     setFilteredData(newData as GoodsData[]);
 
     return () => {};
-  }, [categoryValue, stateValue, regionValue, minPriceValue, maxPriceValue, soldOutValue]);
+  }, [data, categoryValue, stateValue, regionValue, minPriceValue, maxPriceValue, soldOutValue]);
 
   return newData;
 };

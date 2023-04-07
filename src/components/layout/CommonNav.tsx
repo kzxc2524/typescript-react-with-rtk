@@ -160,9 +160,15 @@ const CommonNav = ({ navList, position, children, ...porops }: CommonNavProps) =
             return (
               <li key={idx} className={item.class}>
                 <>
-                  <Link to={url} onClick={(e) => (url !== "#" ? readyMenuClick(e) : null)}>
-                    <i className={"navIcon"}>{icon}</i> <span className={"navText"}>{text}</span>
-                  </Link>
+                  {url !== "#" ? (
+                    <Link to={url}>
+                      <i className={"navIcon"}>{icon}</i> <span className={"navText"}>{text}</span>
+                    </Link>
+                  ) : (
+                    <Link to={url} onClick={(e) => readyMenuClick(e)}>
+                      <i className={"navIcon"}>{icon}</i> <span className={"navText"}>{text}</span>
+                    </Link>
+                  )}
                 </>
               </li>
             );

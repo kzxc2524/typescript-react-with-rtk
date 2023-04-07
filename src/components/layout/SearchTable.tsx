@@ -536,7 +536,7 @@ const SearchTable = () => {
     e.api.setQuickFilter(inputValue);
     setSearchInputValue(inputValue);
     searchInputRef.current?.focus();
-    navigate("/search", { replace: true }); //location 지우기
+    // navigate("/search", { replace: true }); //location 지우기
   };
 
   const isGoodsData = (arg: GoodsData[] | undefined): arg is GoodsData[] => {

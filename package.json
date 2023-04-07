@@ -12,8 +12,9 @@
   "reactSnap": {
     "source": "./dist",
     "include": [
+      "/",
       "/search",
-      "/"
+      "/account"
     ]
   },
   "browserslist": [
@@ -47,13 +48,13 @@
     "lodash": "^4.17.21",
     "notistack": "^3.0.1",
     "perfect-scrollbar": "^1.5.5",
+    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-number-format": "^5.1.4",
     "react-papaparse": "^4.1.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.2",
-    "react-router-sitemap": "^1.2.0",
     "react-router-sitemap-generator": "^0.0.8",
     "react-snap": "^1.23.0",
     "react-virtuoso": "^4.1.0",

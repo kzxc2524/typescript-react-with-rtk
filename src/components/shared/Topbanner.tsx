@@ -32,10 +32,10 @@ const TopBannerText = styled(Typography)<styleProps>(({ theme, theme_mode }) => 
     },
     [theme.breakpoints.down(1024)]: {
       "&": {
-        height: "15px",
-        lineHeight: "15px",
+        height: "16px",
+        lineHeight: "21px",
         position: "absolute",
-        fontSize: "0.6rem",
+        fontSize: "0.55rem",
         zIndex: 500,
         top: 40,
       },

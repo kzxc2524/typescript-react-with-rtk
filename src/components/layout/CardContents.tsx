@@ -302,6 +302,10 @@ const CardContents = ({ images, columnNum, spacing }: CardContentProps) => {
       <Typography>
         <span className={"subContentsTitle noto300"}>품서폿에서 찾자!</span>
         <span className={"mainContentsTitle noto700"}>당신이 지나친 답례품!!</span>
+        <span style={{ visibility: "hidden" }}>
+          답례품 검색 통계 pumsupport 품 서폿 품서폿 고향사랑기부 답례품 고향사랑 고향 고향사랑기부답례품 검색 통계 데이터 데이터베이스 아이 어른
+          가성비
+        </span>
       </Typography>
       <StyledBox is_wrap={isWrap} ref={containerRef} className={"scrollCustom"}>
         <CardElems images={images} columnNum={columnNum} spacing={spacing} />

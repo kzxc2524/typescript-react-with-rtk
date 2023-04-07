@@ -1,4 +1,8 @@
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, useRef, useCallback, ReactNode } from "react";
+
+import { useLocation, useNavigate } from "react-router-dom";
+
+import queryString from "query-string";
 
 import { NumericFormat, NumericFormatProps } from "react-number-format";
 
@@ -304,6 +308,7 @@ type Props<
   options: cityData[];
   value: cityData | null;
   keyName: string;
+  ref?: React.MutableRefObject<HTMLInputElement | null>;
   onChange: (e: object, values: any, key: string) => void;
 };
 
@@ -316,7 +321,7 @@ const CustomPaper = ({ children, ...paperProps }: { children: ReactNode } & Pape
   );
 };
 
-const AutoCompleteCustom = <T,>(props: Props<T>) => {
+const AutoCompleteCustom = React.forwardRef<HTMLInputElement, Props<cityData>>((props, ref) => {
   const themeMode = usePaletteMode();
   const { style, label, options, value, keyName, onChange } = props;
   return (
@@ -339,13 +344,17 @@ const AutoCompleteCustom = <T,>(props: Props<T>) => {
         onChange={(e, values) => onChange(e, values, keyName)}
         renderInput={(params) => <TextField {...params} variant="standard" label={label} />}
         theme_mode={themeMode}
+        ref={ref}
+        isOptionEqualToValue={(option, newValue) => {
+          return (option as cityData).code === (newValue as cityData).code;
+        }}
       />
     </StyledFormControl>
   );
-};
+});
 
 const CitiesAutoSelect = () => {
-  const dispach = useDispatch();
+  const dispatch = useDispatch();
   // const [cityValue, setCityValue] = useState<cityValueObject>({
   //   state: null,
   //   region: null,
@@ -357,12 +366,19 @@ const CitiesAutoSelect = () => {
   //   district: [],
   // });
 
+  const location = useLocation();
+
+  const search = location.search;
+
+  const stateAutoCompleteRef = useRef<HTMLInputElement | null>(null);
+  const regionAutoCompleteRef = useRef<HTMLInputElement | null>(null);
+
   const cityValue = useSelector((state: RootState) => {
     return state.citiesValueFilter.value;
   });
 
   const setCityValue = (data: cityValueObject) => {
-    dispach(changeCitiesValue(data));
+    dispatch(changeCitiesValue(data));
   };
 
   const cityList = useSelector((state: RootState) => {
@@ -370,16 +386,39 @@ const CitiesAutoSelect = () => {
   });
 
   const setCityList = (data: cityList) => {
-    dispach(changeCitiesList(data));
+    dispatch(changeCitiesList(data));
+  };
+
+  const parseQueryString = (qs: string) => {
+    let parseString = queryString.parse(qs, { arrayFormat: "comma" });
+    return parseString;
   };
 
   useEffect(() => {
     const dataPromise = fetchJuso();
-    dataPromise.then((data) => {
-      let cityListCopy = { ...cityList };
-      cityListCopy = { ...cityListCopy, state: data.regcodes };
-      setCityList(cityListCopy);
-    });
+    dataPromise
+      .then((data) => {
+        let cityListCopy = { ...cityList };
+        cityListCopy = { ...cityListCopy, state: data.regcodes };
+        setCityList(cityListCopy);
+
+        return data;
+      })
+      .then((stateData) => {
+        if (!search) return;
+        let parseString = parseQueryString(search);
+        if (parseString?.state) {
+          let searchState = parseString?.state ? ({ code: parseString?.stateCode, name: parseString?.state } as cityData) : null;
+
+          const dataPromise = fetchJuso(apiBase.replace("*00000000", makeRegionCode(parseString?.stateCode as string)));
+
+          dataPromise.then((regionData) => {
+            let cityListCopy = { state: [...stateData.regcodes], region: [{ code: "본청", name: "본청" }, ...regionData.regcodes], district: [] };
+
+            setCityList(cityListCopy);
+          });
+        }
+      });
   }, []);
 
   const allStateCode = "*00000000";
@@ -388,7 +427,7 @@ const CitiesAutoSelect = () => {
     let targetCode = code.slice(0, 2) + "*";
 
     targetCode = String(targetCode).padEnd(9, "0");
-    console.log(targetCode);
+    // console.log(targetCode);
 
     // apiBase.replace("*00000000", targetCode);
 
@@ -397,67 +436,73 @@ const CitiesAutoSelect = () => {
 
   const makeDistrictCode = (code: string) => {
     let targetCode = code.slice(0, 4) + "*";
-    console.log(targetCode);
+    // console.log(targetCode);
 
     // apiBase.replace("*00000000", targetCode);
     return targetCode;
   };
 
-  const stateChange = (stateCode: string) => {
-    let cityListCopy = { ...cityList };
-    let code = allStateCode;
-    let key = "region";
-    let check = stateCode !== "" && stateCode !== undefined;
-    if (check) {
-      code = makeRegionCode(stateCode);
-    } else {
-      cityListCopy = { ...cityListCopy, [key]: [], district: [] };
-      key = "state";
-    }
-
-    console.log("stateChange");
-    const dataPromise = fetchJuso(apiBase.replace("*00000000", code));
-
-    dataPromise.then((data) => {
-      console.log(data.regcodes);
-
+  const stateChange = useCallback(
+    (stateCode: string) => {
+      let cityListCopy = { ...cityList };
+      let code = allStateCode;
+      let key = "region";
+      let check = stateCode !== "" && stateCode !== undefined;
       if (check) {
-        cityListCopy = { ...cityListCopy, [key]: [{ code: "본청", name: "본청" }, ...data.regcodes] };
+        code = makeRegionCode(stateCode);
       } else {
-        cityListCopy = { ...cityListCopy, [key]: [...data.regcodes] };
+        cityListCopy = { ...cityListCopy, [key]: [], district: [] };
+        key = "state";
       }
 
-      setCityList(cityListCopy);
-    });
-    // + 데이터 필터
-  };
+      // console.log("stateChange");
+      const dataPromise = fetchJuso(apiBase.replace("*00000000", code));
 
-  const regionChange = (regionCode: string) => {
-    let cityListCopy = { ...cityList };
-    let code = cityValue.state?.code as string;
-    let key = "district";
-    let check = regionCode !== "" && regionCode !== undefined;
-    if (check) {
-      // code = makeDistrictCode(regionCode); // district가 필요할 때 사용
-    } else {
-      code = makeRegionCode(code);
-      cityListCopy = { ...cityListCopy, [key]: [] };
-      key = "region";
-    }
+      dataPromise.then((data) => {
+        // console.log(data.regcodes);
 
-    // + 데이터 필터
+        if (check) {
+          cityListCopy = { ...cityListCopy, [key]: [{ code: "본청", name: "본청" }, ...data.regcodes] };
+        } else {
+          cityListCopy = { ...cityListCopy, [key]: [...data.regcodes] };
+        }
 
-    /* district가 필요할 때 사용 */
-    // console.log("regionChange");
-    // const dataPromise = fetchJuso(apiBase.replace("*00000000", code));
+        setCityList(cityListCopy);
+      });
+      // + 데이터 필터
+    },
+    [cityList]
+  );
 
-    // dataPromise.then((data) => {
-    //   console.log(data.regcodes);
+  const regionChange = useCallback(
+    (regionCode: string) => {
+      let cityListCopy = { ...cityList };
+      let code = cityValue.state?.code as string;
+      let key = "district";
+      let check = regionCode !== "" && regionCode !== undefined;
+      if (check) {
+        // code = makeDistrictCode(regionCode); // district가 필요할 때 사용
+      } else {
+        code = makeRegionCode(code);
+        cityListCopy = { ...cityListCopy, [key]: [] };
+        key = "region";
+      }
 
-    //   cityListCopy = { ...cityListCopy, [key]: [{ code: "본청", name: "본청" }, ...data.regcodes] };
-    //   setCityList(cityListCopy);
-    // });
-  };
+      // + 데이터 필터
+
+      /* district가 필요할 때 사용 */
+      // console.log("regionChange");
+      // const dataPromise = fetchJuso(apiBase.replace("*00000000", code));
+
+      // dataPromise.then((data) => {
+      //   console.log(data.regcodes);
+
+      //   cityListCopy = { ...cityListCopy, [key]: [{ code: "본청", name: "본청" }, ...data.regcodes] };
+      //   setCityList(cityListCopy);
+      // });
+    },
+    [cityList]
+  );
 
   const districtChange = (districtCode: string) => {
     let code = cityValue.region?.code as string;
@@ -477,31 +522,32 @@ const CitiesAutoSelect = () => {
     district: districtChange,
   };
 
-  const codeChange = (e: object, values: any, key: string) => {
-    console.log(e, values, key);
-    let cityValueCopy = { ...cityValue };
+  const codeChange = useCallback(
+    (e: object, values: any, key: string) => {
+      let cityValueCopy = { ...cityValue };
 
-    cityValueCopy = { ...cityValueCopy, [key]: values };
+      cityValueCopy = { ...cityValueCopy, [key]: values };
 
-    switch (key) {
-      case "state":
-        cityValueCopy = { ...cityValueCopy, region: null, district: null };
-        break;
+      switch (key) {
+        case "state":
+          cityValueCopy = { ...cityValueCopy, region: null, district: null };
+          break;
 
-      case "region":
-        cityValueCopy = { ...cityValueCopy, district: null };
-        break;
-    }
+        case "region":
+          cityValueCopy = { ...cityValueCopy, district: null };
+          break;
+      }
 
-    console.log(cityValueCopy);
-    setCityValue(cityValueCopy);
+      setCityValue(cityValueCopy);
 
-    let code = values?.code as string;
-    console.log("code 12321", code);
-    codeChangeAfter[key](code);
+      let code = values?.code as string;
+      // console.log("code 12321", code);
+      codeChangeAfter[key](code);
 
-    // makeRegionCode(stateCode);
-  };
+      // makeRegionCode(stateCode);
+    },
+    [cityValue]
+  );
 
   return (
     <>
@@ -512,6 +558,7 @@ const CitiesAutoSelect = () => {
         value={cityValue.state}
         keyName="state"
         onChange={codeChange}
+        ref={stateAutoCompleteRef}
       />
       <AutoCompleteCustom
         style={{ width: "50%" }} //["minWidth"]: "100px", ["maxWidth"]: "120px"
@@ -520,6 +567,7 @@ const CitiesAutoSelect = () => {
         value={cityValue.region}
         keyName="region"
         onChange={codeChange}
+        ref={regionAutoCompleteRef}
       />
       {/* <AutoCompleteCustom
         style={{ ["minWidth"]: "100px", ["maxWidth"]: "120px" }}
@@ -538,7 +586,7 @@ interface CommonStyleProps {
 }
 
 const SoldOutAutoSelect = ({ style }: CommonStyleProps) => {
-  const displatch = useDispatch();
+  const dispatch = useDispatch();
 
   // const [value, setValue] = useState<cityData | null>(null);
   const [list, setList] = useState<cityData[]>([
@@ -557,11 +605,11 @@ const SoldOutAutoSelect = ({ style }: CommonStyleProps) => {
   });
 
   const setValue = (data: cityData | null) => {
-    displatch(changeSoldOutValue(data));
+    dispatch(changeSoldOutValue(data));
   };
 
   const valueChange = (e: SelectChangeEvent<typeof value>, values: any) => {
-    console.log(e, values);
+    // console.log(e, values);
     setValue(values);
   };
 
@@ -581,7 +629,7 @@ const SoldOutAutoSelect = ({ style }: CommonStyleProps) => {
 
 const MultipleAutoSelectBox = ({ style }: CommonStyleProps) => {
   const themeMode = usePaletteMode();
-  const dispach = useDispatch();
+  const dispatch = useDispatch();
 
   const theme = useTheme();
   const data = useSelector((state: RootState) => {
@@ -595,11 +643,11 @@ const MultipleAutoSelectBox = ({ style }: CommonStyleProps) => {
   });
 
   const setCategoryValue = (data: category) => {
-    dispach(changeCategoryValue(data));
+    dispatch(changeCategoryValue(data));
   };
 
   const setCategoryList = (data: category) => {
-    dispach(changeCategoryList(data));
+    dispatch(changeCategoryList(data));
   };
 
   const [personName, setPersonName] = React.useState<string[]>([]);
@@ -620,6 +668,7 @@ const MultipleAutoSelectBox = ({ style }: CommonStyleProps) => {
   }, [data]);
 
   const handleChange = (e: SelectChangeEvent<typeof personName>, values: any) => {
+    // console.log(values);
     setCategoryValue({ value: values, list: [...categoryList] });
   };
 
@@ -676,6 +725,7 @@ const MultipleAutoSelectBox = ({ style }: CommonStyleProps) => {
 };
 
 // Number to Currency Formatter
+// forwardRef ref를 인자로 전달 할 떄 필요함
 const NumericFormatCustom = React.forwardRef<NumericFormatProps, CustomProps>(function NumericFormatCustom(props, ref) {
   const { onChange, ...other } = props;
 

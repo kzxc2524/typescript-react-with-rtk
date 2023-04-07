@@ -28,6 +28,7 @@ const StyledMobileHeader = styled("nav")(({ theme }) => {
     width: "100vw",
     [theme.breakpoints.down(1024)]: {
       display: "flex",
+      top: 0,
       position: "fixed",
       zIndex: "500",
       background: variables.shallowBlack,

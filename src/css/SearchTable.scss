@@ -50,6 +50,11 @@ html[data-theme="light"] body[data-theme="light"] {
       .ag-overlay-loading-wrapper {
         background: $blueFirst;
       }
+
+      div.ag-overlay-no-rows-wrapper {
+        color: $graphite;
+        font-weight: bold;
+      }
     }
 
     .ag-keyboard-focus .ag-header-cell:focus::after {
@@ -122,6 +127,11 @@ html[data-theme="dark"] body[data-theme="dark"] {
 
       .ag-overlay-loading-wrapper {
         background: $tableBgColor;
+      }
+
+      div.ag-overlay-no-rows-wrapper {
+        color: $emWhite;
+        font-weight: bold;
       }
     }
 

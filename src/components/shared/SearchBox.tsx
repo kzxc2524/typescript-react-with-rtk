@@ -152,7 +152,7 @@ export const StyledTextField = styled(TextField)<styleProps>(({ theme, theme_mod
         "& .MuiInputBase-input": {
           color: theme_mode == "light" ? variables.shallowBlack : variables.emWhite,
           padding: "8px 20px",
-          transition: theme.transitions.create(["paading"]),
+          transition: theme.transitions.create(["padding"]),
 
           "&::placeholder": {
             color: theme_mode == "light" ? variables.darkGrey : variables.emWhite,
@@ -163,6 +163,9 @@ export const StyledTextField = styled(TextField)<styleProps>(({ theme, theme_mod
     [theme.breakpoints.down(1024)]: {
       width: "calc(100vw - 30px)",
       marginTop: "30px",
+      "& .MuiInputBase-root": {
+        overflow: "initial",
+      },
     },
   };
 });
@@ -226,17 +229,17 @@ const TextInput = ({
 
     let targetTop = targetNode?.getBoundingClientRect().top;
 
-    setPosition(() => {
-      return (targetTop as number) <= 0 && scroll > 0 ? "fixed" : "relative";
-    });
-    // console.log(targetNode, targetTop, scroll);
+    if (scroll > 40) {
+      setPosition("fixed");
+    } else {
+      setPosition("relative");
+    }
   }, [scroll]);
 
   return (
     <StyledTextField
       {...props}
       theme_mode={themeMode}
-      style={{ marginTop: props?.style?.marginTop }}
       size="small"
       variant="outlined"
       placeholder="상품, 도시, 가격 등을 검색해보세요"
@@ -294,7 +297,7 @@ const SearchBoxInner = ({ style, children }: SearchBox) => {
         children
       ) : (
         <StyledFormControl id={"globalSearchBox"} className={position} theme_mode={themeMode}>
-          <TextInput style={style} setPosition={setPosition} />
+          <TextInput setPosition={setPosition} />
         </StyledFormControl>
       )}
     </>

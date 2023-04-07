@@ -26,7 +26,7 @@ const citiesValueFilterSlice = createSlice({
   initialState: value,
   reducers: {
     changeCitiesValue: (state, action: PayloadAction<cityValueObject>) => {
-      console.log("changeCitiesValue", action.payload);
+      // console.log("changeCitiesValue", action.payload);
       state.value = action.payload;
     },
   },
